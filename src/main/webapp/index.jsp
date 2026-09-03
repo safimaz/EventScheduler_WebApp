@@ -1,16 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Event Room Scheduler</title>
-</head>
-<body>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
 
-    <h1>Event Room & Resource Scheduler</h1>
-
-    <p>Maven + JSP + Servlet + Tomcat + Oracle</p>
-
-    <h2>Application is running successfully!</h2>
-
-</body>
-</html>
+<%
+    response.sendRedirect("login.jsp");
+%>
