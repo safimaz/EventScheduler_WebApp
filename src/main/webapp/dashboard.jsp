@@ -156,7 +156,7 @@
                     Search and view available meeting rooms.
                 </p>
 
-                <a href="rooms.jsp">
+                <a href="rooms">
                     View Rooms
                 </a>
 
