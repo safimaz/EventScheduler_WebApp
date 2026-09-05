@@ -201,7 +201,7 @@
                     View available shared resources.
                 </p>
 
-                <a href="resources.jsp">
+                <a href="resources">
                     Resources
                 </a>
 
