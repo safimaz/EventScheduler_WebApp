@@ -171,7 +171,7 @@
                     Create a new room booking.
                 </p>
 
-                <a href="booking.jsp">
+                <a href="book-room">
                     New Booking
                 </a>
 
@@ -186,7 +186,7 @@
                     View and manage your bookings.
                 </p>
 
-                <a href="myBookings.jsp">
+                <a href="my-bookings">
                     My Bookings
                 </a>
 
