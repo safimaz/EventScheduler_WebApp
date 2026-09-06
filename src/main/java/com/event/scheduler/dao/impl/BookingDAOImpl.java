@@ -1,5 +1,6 @@
 package com.event.scheduler.dao.impl;
 
+import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -44,6 +45,76 @@ public class BookingDAOImpl implements BookingDAO {
         }
     }
 
+    @Override
+    public int addBooking(Booking booking, Connection connection) {
+
+        String sql = "INSERT INTO bookings "
+                + "(room_id, user_id, start_time, end_time, "
+                + "attendee_count, purpose, status) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement statement =
+                connection.prepareStatement(
+                        sql,
+                        Statement.RETURN_GENERATED_KEYS)) {
+
+            statement.setInt(1, booking.getRoomId());
+
+            statement.setInt(2, booking.getUserId());
+
+            statement.setTimestamp(
+                    3,
+                    Timestamp.valueOf(
+                            booking.getStartTime()));
+
+            statement.setTimestamp(
+                    4,
+                    Timestamp.valueOf(
+                            booking.getEndTime()));
+
+            statement.setInt(
+                    5,
+                    booking.getAttendeeCount());
+
+            statement.setString(
+                    6,
+                    booking.getPurpose());
+
+            statement.setString(
+                    7,
+                    booking.getStatus());
+
+            int rowsInserted =
+                    statement.executeUpdate();
+
+            if (rowsInserted == 0) {
+                return -1;
+            }
+
+            try (ResultSet resultSet =
+                    statement.getGeneratedKeys()) {
+
+                if (resultSet.next()) {
+
+                    int bookingId =
+                            resultSet.getInt(1);
+
+                    booking.setBookingId(bookingId);
+
+                    return bookingId;
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return -1;
+        
+//        positive number → booking successfully created
+//        -1              → booking creation failed
+    }
+    
     @Override
     public Booking getBookingById(int bookingId) {
 
