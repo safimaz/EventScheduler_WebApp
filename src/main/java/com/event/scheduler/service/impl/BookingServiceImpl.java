@@ -1,5 +1,6 @@
 package com.event.scheduler.service.impl;
 
+import java.sql.Connection;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import com.event.scheduler.dao.impl.RoomDAOImpl;
 import com.event.scheduler.model.Booking;
 import com.event.scheduler.model.Room;
 import com.event.scheduler.service.BookingService;
+import com.event.scheduler.util.DBConnection;
 
 public class BookingServiceImpl
         implements BookingService {
@@ -62,7 +64,9 @@ public class BookingServiceImpl
         // 2. Check room exists
         // -----------------------------------------
 
-        Room room = roomDAO.getRoomById(booking.getRoomId());
+        Room room =
+                roomDAO.getRoomById(
+                        booking.getRoomId());
 
         if (room == null) {
             return false;
@@ -72,7 +76,8 @@ public class BookingServiceImpl
         // 3. Check room status
         // -----------------------------------------
 
-        if (!"AVAILABLE".equalsIgnoreCase(room.getStatus())) {
+        if (!"AVAILABLE".equalsIgnoreCase(
+                room.getStatus())) {
 
             return false;
         }
@@ -81,7 +86,8 @@ public class BookingServiceImpl
         // 4. Check room capacity
         // -----------------------------------------
 
-        if (booking.getAttendeeCount() > room.getCapacity()) {
+        if (booking.getAttendeeCount()
+                > room.getCapacity()) {
 
             return false;
         }
@@ -101,16 +107,67 @@ public class BookingServiceImpl
         }
 
         // -----------------------------------------
-        // 6. New bookings start as PENDING
+        // 6. Set initial status
         // -----------------------------------------
 
         booking.setStatus("PENDING");
 
         // -----------------------------------------
-        // 7. Save booking
+        // 7. Start database transaction
         // -----------------------------------------
 
-        return bookingDAO.addBooking(booking);
+        try (Connection connection =
+                DBConnection.getConnection()) {
+
+            connection.setAutoCommit(false);
+
+            try {
+
+                // ---------------------------------
+                // Create booking
+                // ---------------------------------
+
+                int bookingId =
+                        bookingDAO.addBooking(
+                                booking,
+                                connection);
+
+                if (bookingId <= 0) {
+
+                    connection.rollback();
+
+                    return false;
+                }
+
+                // ---------------------------------
+                // Booking created successfully
+                // ---------------------------------
+
+                booking.setBookingId(bookingId);
+
+                // ---------------------------------
+                // Commit transaction
+                // ---------------------------------
+
+                connection.commit();
+
+                return true;
+
+            } catch (Exception e) {
+
+                connection.rollback();
+
+                e.printStackTrace();
+
+                return false;
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            return false;
+        }
     }
 
     @Override

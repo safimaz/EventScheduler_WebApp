@@ -1,6 +1,6 @@
 package com.event.scheduler.dao.impl;
 
-import java.sql.Statement;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -56,7 +56,7 @@ public class BookingDAOImpl implements BookingDAO {
         try (PreparedStatement statement =
                 connection.prepareStatement(
                         sql,
-                        Statement.RETURN_GENERATED_KEYS)) {
+                        new String[] {"BOOKING_ID"})) {
 
             statement.setInt(1, booking.getRoomId());
 
