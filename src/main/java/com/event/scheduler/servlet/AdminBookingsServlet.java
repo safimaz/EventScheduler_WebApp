@@ -6,12 +6,20 @@ import java.util.List;
 import java.util.Map;
 
 import com.event.scheduler.model.Booking;
+import com.event.scheduler.model.BookingResource;
+import com.event.scheduler.model.Resource;
 import com.event.scheduler.model.Room;
 import com.event.scheduler.model.User;
+
+import com.event.scheduler.service.BookingResourceService;
 import com.event.scheduler.service.BookingService;
+import com.event.scheduler.service.ResourceService;
 import com.event.scheduler.service.RoomService;
 import com.event.scheduler.service.UserService;
+
+import com.event.scheduler.service.impl.BookingResourceServiceImpl;
 import com.event.scheduler.service.impl.BookingServiceImpl;
+import com.event.scheduler.service.impl.ResourceServiceImpl;
 import com.event.scheduler.service.impl.RoomServiceImpl;
 import com.event.scheduler.service.impl.UserServiceImpl;
 
@@ -28,8 +36,14 @@ public class AdminBookingsServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     private BookingService bookingService;
+
     private RoomService roomService;
+
     private UserService userService;
+
+    private BookingResourceService bookingResourceService;
+
+    private ResourceService resourceService;
 
     @Override
     public void init() throws ServletException {
@@ -42,6 +56,12 @@ public class AdminBookingsServlet extends HttpServlet {
 
         userService =
                 new UserServiceImpl();
+
+        bookingResourceService =
+                new BookingResourceServiceImpl();
+
+        resourceService =
+                new ResourceServiceImpl();
     }
 
     @Override
@@ -96,7 +116,26 @@ public class AdminBookingsServlet extends HttpServlet {
         Map<Integer, String> userNames =
                 new HashMap<>();
 
-        // Get room and user names
+        /*
+         * Map to store resources for each booking.
+         *
+         * Key   = Booking ID
+         * Value = List of BookingResource objects
+         */
+        Map<Integer, List<BookingResource>>
+                bookingResourcesMap =
+                new HashMap<>();
+
+        /*
+         * Map to store actual Resource objects.
+         *
+         * Key   = Resource ID
+         * Value = Resource object
+         */
+        Map<Integer, Resource> resourcesMap =
+                new HashMap<>();
+
+        // Get room, user and resource information
         for (Booking booking : pendingBookings) {
 
             int roomId =
@@ -104,6 +143,9 @@ public class AdminBookingsServlet extends HttpServlet {
 
             int userId =
                     booking.getUserId();
+
+            int bookingId =
+                    booking.getBookingId();
 
             // Get room name
             if (!roomNames.containsKey(roomId)) {
@@ -132,20 +174,74 @@ public class AdminBookingsServlet extends HttpServlet {
                             user.getName());
                 }
             }
+
+            // Get resources associated with booking
+            List<BookingResource> bookingResources =
+                    bookingResourceService
+                            .getResourcesByBooking(
+                                    bookingId);
+
+            bookingResourcesMap.put(
+                    bookingId,
+                    bookingResources);
+
+            /*
+             * Get actual resource details
+             * for every selected resource.
+             */
+            if (bookingResources != null) {
+
+                for (BookingResource bookingResource
+                        : bookingResources) {
+
+                    int resourceId =
+                            bookingResource.getResourceId();
+
+                    if (!resourcesMap.containsKey(
+                            resourceId)) {
+
+                        Resource resource =
+                                resourceService
+                                        .getResourceById(
+                                                resourceId);
+
+                        if (resource != null) {
+
+                            resourcesMap.put(
+                                    resourceId,
+                                    resource);
+                        }
+                    }
+                }
+            }
         }
 
+        // Send booking data to JSP
         request.setAttribute(
                 "pendingBookings",
                 pendingBookings);
 
+        // Send room names to JSP
         request.setAttribute(
                 "roomNames",
                 roomNames);
 
+        // Send user names to JSP
         request.setAttribute(
                 "userNames",
                 userNames);
 
+        // Send booking-resource associations
+        request.setAttribute(
+                "bookingResourcesMap",
+                bookingResourcesMap);
+
+        // Send actual resource details
+        request.setAttribute(
+                "resourcesMap",
+                resourcesMap);
+
+        // Forward to admin bookings page
         request.getRequestDispatcher(
                 "/admin-bookings.jsp")
                 .forward(request, response);

@@ -1,6 +1,8 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="com.event.scheduler.model.Booking" %>
+<%@ page import="com.event.scheduler.model.BookingResource" %>
+<%@ page import="com.event.scheduler.model.Resource" %>
 <%@ page import="com.event.scheduler.model.User" %>
 <%@ page import="jakarta.servlet.http.HttpServletResponse" %>
 
@@ -27,7 +29,7 @@
     List<Booking> pendingBookings =
             (List<Booking>) request.getAttribute(
                     "pendingBookings");
-    
+
     Map<Integer, String> roomNames =
             (Map<Integer, String>) request.getAttribute(
                     "roomNames");
@@ -35,6 +37,17 @@
     Map<Integer, String> userNames =
             (Map<Integer, String>) request.getAttribute(
                     "userNames");
+
+    Map<Integer, List<BookingResource>>
+            bookingResourcesMap =
+            (Map<Integer, List<BookingResource>>)
+                    request.getAttribute(
+                            "bookingResourcesMap");
+
+    Map<Integer, Resource> resourcesMap =
+            (Map<Integer, Resource>)
+                    request.getAttribute(
+                            "resourcesMap");
 
     String adminBookingMessage =
             (String) session.getAttribute(
@@ -109,7 +122,7 @@
         .booking-card {
             background-color: white;
             padding: 20px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             border-radius: 8px;
 
             box-shadow:
@@ -133,6 +146,46 @@
             color: #856404;
 
             font-weight: bold;
+        }
+
+        .resources-section {
+            margin-top: 18px;
+            padding: 15px;
+
+            background-color: #f9fafb;
+
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+        }
+
+        .resources-section h4 {
+            margin-top: 0;
+            margin-bottom: 12px;
+        }
+
+        .resource-item {
+            padding: 8px 0;
+
+            border-bottom:
+                1px solid #e5e7eb;
+        }
+
+        .resource-item:last-child {
+            border-bottom: none;
+        }
+
+        .resource-name {
+            font-weight: bold;
+        }
+
+        .resource-quantity {
+            color: #666;
+            margin-left: 8px;
+        }
+
+        .no-resources {
+            color: #666;
+            font-style: italic;
         }
 
         .actions {
@@ -215,6 +268,7 @@
 
     </div>
 
+
     <div class="container">
 
         <a
@@ -225,6 +279,7 @@
 
         </a>
 
+
         <h1>
             Pending Bookings
         </h1>
@@ -234,7 +289,7 @@
         </p>
 
 
-        <%-- Display action message --%>
+        <%-- Admin action message --%>
 
         <%
             if (adminBookingMessage != null) {
@@ -273,13 +328,22 @@
             } else {
 
                 for (Booking booking : pendingBookings) {
+
+                    int bookingId =
+                            booking.getBookingId();
+
+                    List<BookingResource>
+                            bookingResources =
+                            bookingResourcesMap.get(
+                                    bookingId);
         %>
+
 
             <div class="booking-card">
 
                 <h3>
 
-                    Booking #<%= booking.getBookingId() %>
+                    Booking #<%= bookingId %>
 
                 </h3>
 
@@ -287,10 +351,11 @@
                 <div class="booking-info">
 
                     <strong>
-					    Room:
-					</strong>
-					
-					<%= roomNames.get(booking.getRoomId()) %>
+                        Room:
+                    </strong>
+
+                    <%= roomNames.get(
+                            booking.getRoomId()) %>
 
                 </div>
 
@@ -298,10 +363,11 @@
                 <div class="booking-info">
 
                     <strong>
-					    Requested By:
-					</strong>
-					
-					<%= userNames.get(booking.getUserId()) %>
+                        Requested By:
+                    </strong>
+
+                    <%= userNames.get(
+                            booking.getUserId()) %>
 
                 </div>
 
@@ -376,7 +442,68 @@
                 </div>
 
 
-                <!-- Approve / Reject Actions -->
+                <!-- Resources -->
+
+                <div class="resources-section">
+
+                    <h4>
+                        Requested Resources
+                    </h4>
+
+
+                    <%
+                        if (bookingResources == null ||
+                            bookingResources.isEmpty()) {
+                    %>
+
+                        <div class="no-resources">
+
+                            No additional resources requested.
+
+                        </div>
+
+                    <%
+                        } else {
+
+                            for (BookingResource
+                                    bookingResource
+                                    : bookingResources) {
+
+                                Resource resource =
+                                        resourcesMap.get(
+                                                bookingResource
+                                                        .getResourceId());
+
+                                if (resource != null) {
+                    %>
+
+                        <div class="resource-item">
+
+                            <span class="resource-name">
+
+                                <%= resource.getResourceName() %>
+
+                            </span>
+
+                            <span class="resource-quantity">
+
+                                Quantity:
+                                <%= bookingResource.getQuantity() %>
+
+                            </span>
+
+                        </div>
+
+                    <%
+                                }
+                            }
+                        }
+                    %>
+
+                </div>
+
+
+                <!-- Approve / Reject -->
 
                 <div class="actions">
 
@@ -391,7 +518,7 @@
                         <input
                             type="hidden"
                             name="bookingId"
-                            value="<%= booking.getBookingId() %>">
+                            value="<%= bookingId %>">
 
                         <input
                             type="hidden"
@@ -419,7 +546,7 @@
                         <input
                             type="hidden"
                             name="bookingId"
-                            value="<%= booking.getBookingId() %>">
+                            value="<%= bookingId %>">
 
                         <input
                             type="hidden"
@@ -439,6 +566,7 @@
                 </div>
 
             </div>
+
 
         <%
                 }
