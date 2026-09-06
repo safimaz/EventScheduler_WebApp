@@ -1,19 +1,28 @@
 <%@ page import="java.util.List" %>
+
 <%@ page import="java.util.Map" %>
+
 <%@ page import="com.event.scheduler.model.Booking" %>
+
 <%@ page import="com.event.scheduler.model.BookingResource" %>
+
 <%@ page import="com.event.scheduler.model.Resource" %>
+
 <%@ page import="com.event.scheduler.model.User" %>
+
 <%@ page import="jakarta.servlet.http.HttpServletResponse" %>
 
 <%
+
     User loggedInUser =
             (User) session.getAttribute("loggedInUser");
 
     if (loggedInUser == null) {
 
         response.sendRedirect("login.jsp");
+
         return;
+
     }
 
     if (!"ADMIN".equalsIgnoreCase(
@@ -24,6 +33,7 @@
                 "Access Denied");
 
         return;
+
     }
 
     List<Booking> pendingBookings =
@@ -57,7 +67,9 @@
 
         session.removeAttribute(
                 "adminBookingMessage");
+
     }
+
 %>
 
 <!DOCTYPE html>
@@ -68,106 +80,374 @@
 
     <meta charset="UTF-8">
 
-    <title>Pending Bookings - Admin</title>
+    <title>Pending Bookings - Admin | EventSync</title>
 
     <style>
 
-        body {
+        * {
+            box-sizing: border-box;
             margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f8;
+            padding: 0;
         }
 
-        .header {
-            background-color: #1f2937;
-            color: white;
-            padding: 18px 25px;
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+            min-height: 100vh;
+        }
 
+        /* =========================
+           HEADER
+        ========================= */
+
+        .header {
+            height: 72px;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0 42px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .container {
-            padding: 30px;
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
+        .brand-logo {
+            width: 40px;
+            height: 40px;
+            background: #2563eb;
+            color: #ffffff;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .brand-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.3px;
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
+        .admin-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .admin-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .admin-name {
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .admin-role {
+            color: #64748b;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        /* =========================
+           MAIN CONTAINER
+        ========================= */
+
+        .container {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 38px 28px 60px;
+        }
+
+        /* =========================
+           BACK LINK
+        ========================= */
+
         .back-link {
-            color: #4f46e5;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #64748b;
             text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 28px;
+            transition: color 0.2s ease;
         }
 
         .back-link:hover {
-            text-decoration: underline;
+            color: #2563eb;
+        }
+
+        /* =========================
+           PAGE HEADER
+        ========================= */
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 28px;
+            gap: 20px;
         }
 
         h1 {
-            margin-bottom: 10px;
+            font-size: 30px;
+            line-height: 1.2;
+            color: #0f172a;
+            font-weight: 700;
+            letter-spacing: -0.6px;
         }
 
         .subtitle {
-            color: #666;
-            margin-bottom: 25px;
+            color: #64748b;
+            margin-top: 8px;
+            font-size: 14px;
+            line-height: 1.5;
         }
+
+        .admin-label {
+            display: inline-flex;
+            align-items: center;
+            padding: 7px 12px;
+            border-radius: 20px;
+            background: #eff6ff;
+            color: #2563eb;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        /* =========================
+           MESSAGE
+        ========================= */
 
         .message {
-            background-color: #e8f5e9;
-            color: #2e7d32;
-            padding: 12px;
-            margin: 20px 0;
-            border-radius: 6px;
-            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+            padding: 14px 16px;
+            margin: 20px 0 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
         }
+
+        .message-icon {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #22c55e;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* =========================
+           BOOKING LIST
+        ========================= */
+
+        .booking-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        /* =========================
+           BOOKING CARD
+        ========================= */
 
         .booking-card {
-            background-color: white;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-
-            box-shadow:
-                0 2px 8px rgba(0, 0, 0, 0.08);
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            padding: 25px;
+            border-radius: 11px;
+            box-shadow: 0 2px 7px rgba(15, 23, 42, 0.04);
+            transition: all 0.2s ease;
         }
 
-        .booking-card h3 {
-            margin-top: 0;
+        .booking-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 7px 20px rgba(15, 23, 42, 0.08);
         }
 
-        .booking-info {
-            margin: 8px 0;
+        /* =========================
+           BOOKING HEADER
+        ========================= */
+
+        .booking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+            padding-bottom: 18px;
+            margin-bottom: 18px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .booking-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .booking-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 9px;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .booking-heading h3 {
+            color: #0f172a;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .booking-reference {
+            color: #94a3b8;
+            font-size: 12px;
+            margin-top: 4px;
         }
 
         .status {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 5px;
-
-            background-color: #fff3cd;
-            color: #856404;
-
-            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 11px;
+            border-radius: 20px;
+            background: #fffbeb;
+            color: #b45309;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
         }
 
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        /* =========================
+           BOOKING DETAILS
+        ========================= */
+
+        .booking-details {
+            display: grid;
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+            gap: 0 30px;
+        }
+
+        .booking-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 11px 0;
+            border-bottom: 1px solid #f8fafc;
+            font-size: 14px;
+            min-width: 0;
+        }
+
+        .booking-info strong {
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 500;
+            min-width: 95px;
+        }
+
+        .booking-info-value {
+            color: #334155;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        /* =========================
+           RESOURCES SECTION
+        ========================= */
+
         .resources-section {
-            margin-top: 18px;
-            padding: 15px;
+            margin-top: 20px;
+            padding: 18px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 9px;
+        }
 
-            background-color: #f9fafb;
+        .resources-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 13px;
+        }
 
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
+        .resources-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 7px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
         }
 
         .resources-section h4 {
-            margin-top: 0;
-            margin-bottom: 12px;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 700;
         }
 
         .resource-item {
-            padding: 8px 0;
-
-            border-bottom:
-                1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 11px 0;
+            border-bottom: 1px solid #e2e8f0;
         }
 
         .resource-item:last-child {
@@ -175,26 +455,33 @@
         }
 
         .resource-name {
-            font-weight: bold;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 600;
         }
 
         .resource-quantity {
-            color: #666;
+            color: #64748b;
+            font-size: 12px;
             margin-left: 8px;
         }
 
         .no-resources {
-            color: #666;
-            font-style: italic;
+            color: #64748b;
+            font-size: 13px;
+            padding: 5px 0;
         }
+
+        /* =========================
+           ACTIONS
+        ========================= */
 
         .actions {
             margin-top: 20px;
-            padding-top: 15px;
-
-            border-top: 1px solid #e5e7eb;
-
+            padding-top: 18px;
+            border-top: 1px solid #e2e8f0;
             display: flex;
+            justify-content: flex-end;
             gap: 10px;
         }
 
@@ -204,44 +491,179 @@
 
         .approve-button,
         .reject-button {
-            padding: 9px 18px;
-
+            min-width: 100px;
+            padding: 10px 18px;
             border: none;
-            border-radius: 5px;
-
+            border-radius: 7px;
             cursor: pointer;
-
-            font-size: 14px;
-            font-weight: bold;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s ease;
         }
 
         .approve-button {
-            background-color: #198754;
-            color: white;
+            background: #16a34a;
+            color: #ffffff;
         }
 
         .approve-button:hover {
-            background-color: #157347;
+            background: #15803d;
         }
 
         .reject-button {
-            background-color: #dc3545;
-            color: white;
+            background: #ffffff;
+            color: #dc2626;
+            border: 1px solid #fecaca;
         }
 
         .reject-button:hover {
-            background-color: #bb2d3b;
+            background: #fef2f2;
+            border-color: #fca5a5;
         }
+        
+        /* =========================
+   ACTION MESSAGE
+========================= */
+
+.message {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    color: #92400e;
+    padding: 14px 16px;
+    margin: 20px 0 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.message-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #f59e0b;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+        /* =========================
+           EMPTY STATE
+        ========================= */
 
         .empty {
-            background-color: white;
-            padding: 30px;
-
+            background: #ffffff;
+            padding: 70px 30px;
             text-align: center;
+            border: 1px solid #e2e8f0;
+            border-radius: 11px;
+            color: #64748b;
+            box-shadow: 0 2px 7px rgba(15, 23, 42, 0.04);
+        }
 
-            border-radius: 8px;
+        .empty-icon {
+            width: 58px;
+            height: 58px;
+            margin: 0 auto 18px;
+            border-radius: 12px;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+        }
 
-            color: #666;
+        .empty h3 {
+            color: #0f172a;
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .empty p {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        .footer {
+            border-top: 1px solid #e2e8f0;
+            background: #ffffff;
+            padding: 20px 30px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 800px) {
+
+            .header {
+                padding: 0 20px;
+            }
+
+            .container {
+                padding: 28px 18px 45px;
+            }
+
+            .booking-details {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .admin-details {
+                display: none;
+            }
+
+        }
+
+        @media (max-width: 550px) {
+
+            .brand-name {
+                font-size: 18px;
+            }
+
+            .booking-card {
+                padding: 19px;
+            }
+
+            .booking-header {
+                flex-direction: column;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .approve-button,
+            .reject-button {
+                width: 100%;
+            }
+
+            .resource-item {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 5px;
+            }
+
         }
 
     </style>
@@ -250,24 +672,50 @@
 
 <body>
 
+    <!-- =========================
+         HEADER
+    ========================= -->
+
     <div class="header">
 
-        <h2>
-            Event Room Scheduler
-        </h2>
+        <div class="brand">
 
-        <div>
+            <div class="brand-logo">
+                ES
+            </div>
 
-            Admin:
+            <div class="brand-name">
+                EventSync
+            </div>
 
-            <strong>
-                <%= loggedInUser.getName() %>
-            </strong>
+        </div>
+
+        <div class="admin-profile">
+
+            <div class="admin-avatar">
+                ADMIN
+            </div>
+
+            <div class="admin-details">
+
+                <div class="admin-name">
+                    Admin: <%= loggedInUser.getName() %>
+                </div>
+
+                <div class="admin-role">
+                    Administrator
+                </div>
+
+            </div>
 
         </div>
 
     </div>
 
+
+    <!-- =========================
+         MAIN CONTENT
+    ========================= -->
 
     <div class="container">
 
@@ -275,43 +723,69 @@
             class="back-link"
             href="<%= request.getContextPath() %>/admin">
 
-            ← Back to Admin Dashboard
+            Back to Admin Dashboard
 
         </a>
 
 
-        <h1>
-            Pending Bookings
-        </h1>
+        <div class="page-header">
 
-        <p class="subtitle">
-            Review booking requests waiting for approval.
-        </p>
+            <div>
+
+                <h1>
+                    Pending Bookings
+                </h1>
+
+                <p class="subtitle">
+                    Review booking requests waiting for approval.
+                </p>
+
+            </div>
+
+            <div class="admin-label">
+                ADMIN REVIEW
+            </div>
+
+        </div>
 
 
         <%-- Admin action message --%>
 
         <%
+
             if (adminBookingMessage != null) {
+
         %>
 
             <div class="message">
 
-                <%= adminBookingMessage %>
-
-            </div>
+		    <div class="message-icon">
+		        !
+		    </div>
+		
+		    <%= adminBookingMessage %>
+		
+		</div>
 
         <%
+
             }
+
         %>
 
 
         <%
+
             if (pendingBookings == null ||
                 pendingBookings.isEmpty()) {
+
         %>
 
             <div class="empty">
+
+                <div class="empty-icon">
+                    EMPTY
+                </div>
 
                 <h3>
                     No Pending Bookings
@@ -325,7 +799,14 @@
             </div>
 
         <%
+
             } else {
+
+        %>
+
+            <div class="booking-list">
+
+        <%
 
                 for (Booking booking : pendingBookings) {
 
@@ -336,242 +817,329 @@
                             bookingResources =
                             bookingResourcesMap.get(
                                     bookingId);
+
         %>
 
 
-            <div class="booking-card">
+                <div class="booking-card">
 
-                <h3>
+                    <div class="booking-header">
 
-                    Booking #<%= bookingId %>
+                        <div class="booking-title">
 
-                </h3>
+                            <div class="booking-icon">
+                                ID
+                            </div>
 
+                            <div class="booking-heading">
 
-                <div class="booking-info">
+                                <h3>
+                                    Booking #<%= bookingId %>
+                                </h3>
 
-                    <strong>
-                        Room:
-                    </strong>
+                                <div class="booking-reference">
+                                    Booking request awaiting review
+                                </div>
 
-                    <%= roomNames.get(
-                            booking.getRoomId()) %>
-
-                </div>
-
-
-                <div class="booking-info">
-
-                    <strong>
-                        Requested By:
-                    </strong>
-
-                    <%= userNames.get(
-                            booking.getUserId()) %>
-
-                </div>
-
-
-                <div class="booking-info">
-
-                    <strong>
-                        Start:
-                    </strong>
-
-                    <%= booking.getStartTime() %>
-
-                </div>
-
-
-                <div class="booking-info">
-
-                    <strong>
-                        End:
-                    </strong>
-
-                    <%= booking.getEndTime() %>
-
-                </div>
-
-
-                <div class="booking-info">
-
-                    <strong>
-                        Attendees:
-                    </strong>
-
-                    <%= booking.getAttendeeCount() %>
-
-                </div>
-
-
-                <div class="booking-info">
-
-                    <strong>
-                        Purpose:
-                    </strong>
-
-                    <%= booking.getPurpose() %>
-
-                </div>
-
-
-                <div class="booking-info">
-
-                    <strong>
-                        Created:
-                    </strong>
-
-                    <%= booking.getCreatedAt() %>
-
-                </div>
-
-
-                <div class="booking-info">
-
-                    <strong>
-                        Status:
-                    </strong>
-
-                    <span class="status">
-
-                        <%= booking.getStatus() %>
-
-                    </span>
-
-                </div>
-
-
-                <!-- Resources -->
-
-                <div class="resources-section">
-
-                    <h4>
-                        Requested Resources
-                    </h4>
-
-
-                    <%
-                        if (bookingResources == null ||
-                            bookingResources.isEmpty()) {
-                    %>
-
-                        <div class="no-resources">
-
-                            No additional resources requested.
+                            </div>
 
                         </div>
 
-                    <%
-                        } else {
 
-                            for (BookingResource
-                                    bookingResource
-                                    : bookingResources) {
+                        <span class="status">
 
-                                Resource resource =
-                                        resourcesMap.get(
-                                                bookingResource
-                                                        .getResourceId());
+                            <span class="status-dot"></span>
 
-                                if (resource != null) {
-                    %>
+                            <%= booking.getStatus() %>
 
-                        <div class="resource-item">
+                        </span>
 
-                            <span class="resource-name">
+                    </div>
 
-                                <%= resource.getResourceName() %>
 
-                            </span>
+                    <div class="booking-details">
 
-                            <span class="resource-quantity">
 
-                                Quantity:
-                                <%= bookingResource.getQuantity() %>
+                        <div class="booking-info">
+
+                            <strong>
+                                Room:
+                            </strong>
+
+                            <span class="booking-info-value">
+
+                                <%= roomNames.get(
+                                        booking.getRoomId()) %>
 
                             </span>
 
                         </div>
 
-                    <%
+
+                        <div class="booking-info">
+
+                            <strong>
+                                Requested By:
+                            </strong>
+
+                            <span class="booking-info-value">
+
+                                <%= userNames.get(
+                                        booking.getUserId()) %>
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="booking-info">
+
+                            <strong>
+                                Start:
+                            </strong>
+
+                            <span class="booking-info-value">
+
+                                <%= booking.getStartTime() %>
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="booking-info">
+
+                            <strong>
+                                End:
+                            </strong>
+
+                            <span class="booking-info-value">
+
+                                <%= booking.getEndTime() %>
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="booking-info">
+
+                            <strong>
+                                Attendees:
+                            </strong>
+
+                            <span class="booking-info-value">
+
+                                <%= booking.getAttendeeCount() %>
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="booking-info">
+
+                            <strong>
+                                Purpose:
+                            </strong>
+
+                            <span class="booking-info-value">
+
+                                <%= booking.getPurpose() %>
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="booking-info">
+
+                            <strong>
+                                Created:
+                            </strong>
+
+                            <span class="booking-info-value">
+
+                                <%= booking.getCreatedAt() %>
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="booking-info">
+
+                            <strong>
+                                Status:
+                            </strong>
+
+                            <span class="booking-info-value">
+
+                                <%= booking.getStatus() %>
+
+                            </span>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <!-- Resources -->
+
+                    <div class="resources-section">
+
+                        <div class="resources-header">
+
+                            <div class="resources-icon">
+                                RES
+                            </div>
+
+                            <h4>
+                                Requested Resources
+                            </h4>
+
+                        </div>
+
+
+                        <%
+
+                            if (bookingResources == null ||
+                                bookingResources.isEmpty()) {
+
+                        %>
+
+                            <div class="no-resources">
+
+                                No additional resources requested.
+
+                            </div>
+
+                        <%
+
+                            } else {
+
+                                for (BookingResource
+                                        bookingResource
+                                        : bookingResources) {
+
+                                    Resource resource =
+                                            resourcesMap.get(
+                                                    bookingResource
+                                                            .getResourceId());
+
+                                    if (resource != null) {
+
+                        %>
+
+
+                            <div class="resource-item">
+
+                                <span class="resource-name">
+
+                                    <%= resource.getResourceName() %>
+
+                                </span>
+
+                                <span class="resource-quantity">
+
+                                    Quantity:
+
+                                    <%= bookingResource.getQuantity() %>
+
+                                </span>
+
+                            </div>
+
+
+                        <%
+
+                                    }
+
                                 }
+
                             }
-                        }
-                    %>
+
+                        %>
+
+                    </div>
+
+
+                    <!-- Approve / Reject -->
+
+                    <div class="actions">
+
+
+                        <!-- APPROVE -->
+
+                        <form
+                            class="action-form"
+                            action="<%= request.getContextPath() %>/admin/booking-action"
+                            method="post">
+
+                            <input
+                                type="hidden"
+                                name="bookingId"
+                                value="<%= bookingId %>">
+
+                            <input
+                                type="hidden"
+                                name="action"
+                                value="approve">
+
+                            <button
+                                type="submit"
+                                class="approve-button">
+
+                                Approve
+
+                            </button>
+
+                        </form>
+
+
+                        <!-- REJECT -->
+
+                        <form
+                            class="action-form"
+                            action="<%= request.getContextPath() %>/admin/booking-action"
+                            method="post">
+
+                            <input
+                                type="hidden"
+                                name="bookingId"
+                                value="<%= bookingId %>">
+
+                            <input
+                                type="hidden"
+                                name="action"
+                                value="reject">
+
+                            <button
+                                type="submit"
+                                class="reject-button">
+
+                                Reject
+
+                            </button>
+
+                        </form>
+
+
+                    </div>
 
                 </div>
-
-
-                <!-- Approve / Reject -->
-
-                <div class="actions">
-
-
-                    <!-- APPROVE -->
-
-                    <form
-                        class="action-form"
-                        action="<%= request.getContextPath() %>/admin/booking-action"
-                        method="post">
-
-                        <input
-                            type="hidden"
-                            name="bookingId"
-                            value="<%= bookingId %>">
-
-                        <input
-                            type="hidden"
-                            name="action"
-                            value="approve">
-
-                        <button
-                            type="submit"
-                            class="approve-button">
-
-                            Approve
-
-                        </button>
-
-                    </form>
-
-
-                    <!-- REJECT -->
-
-                    <form
-                        class="action-form"
-                        action="<%= request.getContextPath() %>/admin/booking-action"
-                        method="post">
-
-                        <input
-                            type="hidden"
-                            name="bookingId"
-                            value="<%= bookingId %>">
-
-                        <input
-                            type="hidden"
-                            name="action"
-                            value="reject">
-
-                        <button
-                            type="submit"
-                            class="reject-button">
-
-                            Reject
-
-                        </button>
-
-                    </form>
-
-                </div>
-
-            </div>
 
 
         <%
+
                 }
+
             }
+
         %>
+
+            </div>
 
     </div>
 
