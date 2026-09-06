@@ -3,6 +3,7 @@
     pageEncoding="UTF-8"%>
 
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
 <%@ page import="com.event.scheduler.model.Booking" %>
 <%@ page import="com.event.scheduler.model.User" %>
 
@@ -17,6 +18,9 @@
 
     List<Booking> bookings =
         (List<Booking>) request.getAttribute("bookings");
+    
+    Map<Integer, String> roomNames =
+    	    (Map<Integer, String>) request.getAttribute("roomNames");
 
     String successMessage =
         (String) session.getAttribute("successMessage");
@@ -635,7 +639,7 @@
                         <strong>Room Name:</strong>
 
                         <span>
-                            <%= booking.getRoomId() %>
+                            <%= roomNames.get(booking.getRoomId()) %>
                         </span>
 
                     </div>
