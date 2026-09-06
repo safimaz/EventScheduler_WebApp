@@ -1,4 +1,5 @@
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
 <%@ page import="com.event.scheduler.model.Booking" %>
 <%@ page import="com.event.scheduler.model.User" %>
 <%@ page import="jakarta.servlet.http.HttpServletResponse" %>
@@ -26,6 +27,14 @@
     List<Booking> pendingBookings =
             (List<Booking>) request.getAttribute(
                     "pendingBookings");
+    
+    Map<Integer, String> roomNames =
+            (Map<Integer, String>) request.getAttribute(
+                    "roomNames");
+
+    Map<Integer, String> userNames =
+            (Map<Integer, String>) request.getAttribute(
+                    "userNames");
 
     String adminBookingMessage =
             (String) session.getAttribute(
@@ -278,10 +287,10 @@
                 <div class="booking-info">
 
                     <strong>
-                        Room ID:
-                    </strong>
-
-                    <%= booking.getRoomId() %>
+					    Room:
+					</strong>
+					
+					<%= roomNames.get(booking.getRoomId()) %>
 
                 </div>
 
@@ -289,10 +298,10 @@
                 <div class="booking-info">
 
                     <strong>
-                        User ID:
-                    </strong>
-
-                    <%= booking.getUserId() %>
+					    Requested By:
+					</strong>
+					
+					<%= userNames.get(booking.getUserId()) %>
 
                 </div>
 
