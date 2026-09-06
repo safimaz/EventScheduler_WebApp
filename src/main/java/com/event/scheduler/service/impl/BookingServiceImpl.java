@@ -5,10 +5,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.event.scheduler.dao.BookingDAO;
+import com.event.scheduler.dao.BookingResourceDAO;
 import com.event.scheduler.dao.RoomDAO;
 import com.event.scheduler.dao.impl.BookingDAOImpl;
+import com.event.scheduler.dao.impl.BookingResourceDAOImpl;
 import com.event.scheduler.dao.impl.RoomDAOImpl;
 import com.event.scheduler.model.Booking;
+import com.event.scheduler.model.BookingResource;
 import com.event.scheduler.model.Room;
 import com.event.scheduler.service.BookingService;
 import com.event.scheduler.util.DBConnection;
@@ -16,14 +19,17 @@ import com.event.scheduler.util.DBConnection;
 public class BookingServiceImpl
         implements BookingService {
 
-    private final BookingDAO bookingDAO;
-    private final RoomDAO roomDAO;
+	private final BookingDAO bookingDAO;
+	private final RoomDAO roomDAO;
+	private final BookingResourceDAO bookingResourceDAO;
 
-    public BookingServiceImpl() {
+	public BookingServiceImpl() {
 
-        this.bookingDAO = new BookingDAOImpl();
-        this.roomDAO = new RoomDAOImpl();
-    }
+	    this.bookingDAO = new BookingDAOImpl();
+	    this.roomDAO = new RoomDAOImpl();
+	    this.bookingResourceDAO =
+	            new BookingResourceDAOImpl();
+	}
 
     @Override
     public boolean createBooking(Booking booking) {
@@ -170,6 +176,219 @@ public class BookingServiceImpl
         }
     }
 
+    @Override
+    public boolean createBooking(
+            Booking booking,
+            List<BookingResource> bookingResources) {
+
+        // -----------------------------------------
+        // 1. Basic booking validation
+        // -----------------------------------------
+
+        if (booking == null) {
+            return false;
+        }
+
+        if (booking.getRoomId() <= 0 ||
+                booking.getUserId() <= 0) {
+
+            return false;
+        }
+
+        if (booking.getStartTime() == null ||
+                booking.getEndTime() == null) {
+
+            return false;
+        }
+
+        if (!booking.getEndTime()
+                .isAfter(booking.getStartTime())) {
+
+            return false;
+        }
+
+        if (booking.getAttendeeCount() <= 0) {
+            return false;
+        }
+
+        // -----------------------------------------
+        // 2. Check room
+        // -----------------------------------------
+
+        Room room =
+                roomDAO.getRoomById(
+                        booking.getRoomId());
+
+        if (room == null) {
+            return false;
+        }
+
+        // -----------------------------------------
+        // 3. Check room status
+        // -----------------------------------------
+
+        if (!"AVAILABLE".equalsIgnoreCase(
+                room.getStatus())) {
+
+            return false;
+        }
+
+        // -----------------------------------------
+        // 4. Check room capacity
+        // -----------------------------------------
+
+        if (booking.getAttendeeCount()
+                > room.getCapacity()) {
+
+            return false;
+        }
+
+        // -----------------------------------------
+        // 5. Check room availability
+        // -----------------------------------------
+
+        if (!bookingDAO.isRoomAvailable(
+                booking.getRoomId(),
+                booking.getStartTime(),
+                booking.getEndTime())) {
+
+            return false;
+        }
+
+        // -----------------------------------------
+        // 6. Validate selected resources
+        // -----------------------------------------
+
+        if (bookingResources != null) {
+
+            for (BookingResource bookingResource
+                    : bookingResources) {
+
+                if (bookingResource == null) {
+                    return false;
+                }
+
+                if (bookingResource.getResourceId()
+                        <= 0) {
+
+                    return false;
+                }
+
+                if (bookingResource.getQuantity()
+                        <= 0) {
+
+                    return false;
+                }
+
+                boolean resourceAvailable =
+                        bookingResourceDAO
+                        .isResourceAvailable(
+                                bookingResource
+                                    .getResourceId(),
+                                bookingResource
+                                    .getQuantity(),
+                                booking.getStartTime(),
+                                booking.getEndTime());
+
+                if (!resourceAvailable) {
+                    return false;
+                }
+            }
+        }
+
+        // -----------------------------------------
+        // 7. Set booking status
+        // -----------------------------------------
+
+        booking.setStatus("PENDING");
+
+        // -----------------------------------------
+        // 8. Start transaction
+        // -----------------------------------------
+
+        try (Connection connection =
+                DBConnection.getConnection()) {
+
+            connection.setAutoCommit(false);
+
+            try {
+
+                // ---------------------------------
+                // 9. Create booking
+                // ---------------------------------
+
+                int bookingId =
+                        bookingDAO.addBooking(
+                                booking,
+                                connection);
+
+                if (bookingId <= 0) {
+
+                    connection.rollback();
+
+                    return false;
+                }
+
+                // ---------------------------------
+                // 10. Set generated booking ID
+                // ---------------------------------
+
+                booking.setBookingId(bookingId);
+
+                // ---------------------------------
+                // 11. Attach resources
+                // ---------------------------------
+
+                if (bookingResources != null &&
+                        !bookingResources.isEmpty()) {
+
+                    for (BookingResource bookingResource
+                            : bookingResources) {
+
+                        bookingResource.setBookingId(
+                                bookingId);
+                    }
+
+                    boolean resourcesAdded =
+                            bookingResourceDAO
+                            .addBookingResources(
+                                    bookingResources,
+                                    connection);
+
+                    if (!resourcesAdded) {
+
+                        connection.rollback();
+
+                        return false;
+                    }
+                }
+
+                // ---------------------------------
+                // 12. Everything successful
+                // ---------------------------------
+
+                connection.commit();
+
+                return true;
+
+            } catch (Exception e) {
+
+                connection.rollback();
+
+                e.printStackTrace();
+
+                return false;
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            return false;
+        }
+    }
+    
+    
     @Override
     public Booking getBookingById(int bookingId) {
 

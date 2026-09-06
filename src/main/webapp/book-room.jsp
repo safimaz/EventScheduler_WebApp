@@ -5,6 +5,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="com.event.scheduler.model.Room" %>
 <%@ page import="com.event.scheduler.model.User" %>
+<%@ page import="com.event.scheduler.model.Resource" %>
 
 <%
     User loggedInUser =
@@ -17,6 +18,9 @@
 
     List<Room> rooms =
         (List<Room>) request.getAttribute("rooms");
+    
+    List<Resource> resources =
+    	    (List<Resource>) request.getAttribute("resources");
 
     String errorMessage =
         (String) request.getAttribute("errorMessage");
@@ -113,6 +117,32 @@
         margin-bottom: 20px;
         text-decoration: none;
     }
+    
+    .resource-row {
+	    display: flex;
+	    justify-content: space-between;
+	    align-items: center;
+	    padding: 12px;
+	    margin-bottom: 10px;
+	    background-color: #f9fafb;
+	    border: 1px solid #e5e7eb;
+	    border-radius: 6px;
+	}
+	
+	.resource-row input[type="checkbox"] {
+	    width: auto;
+	    margin-right: 8px;
+	}
+	
+	.resource-row input[type="number"] {
+	    width: 80px;
+	}
+	
+	.resource-quantity {
+	    color: #666;
+	    font-size: 13px;
+	    margin-left: 8px;
+	}
 
 </style>
 
@@ -248,6 +278,68 @@
                     required></textarea>
 
             </div>
+            
+            <div class="form-group">
+
+    <label>
+        Resources
+    </label>
+
+    <%
+        if (resources != null &&
+            !resources.isEmpty()) {
+
+            for (Resource resource : resources) {
+    %>
+
+        <div class="resource-row">
+
+            <div>
+
+                <input
+                    type="checkbox"
+                    name="resourceId"
+                    value="<%= resource.getResourceId() %>">
+
+                <strong>
+                    <%= resource.getResourceName() %>
+                </strong>
+
+                <span class="resource-quantity">
+                    Available:
+                    <%= resource.getQuantity() %>
+                </span>
+
+            </div>
+
+            <div>
+
+                <input
+                    type="number"
+                    name="resourceQuantity_<%= resource.getResourceId() %>"
+                    min="1"
+                    max="<%= resource.getQuantity() %>"
+                    value="1">
+
+            </div>
+
+        </div>
+
+		    <%
+		            }
+		
+		        } else {
+		    %>
+		
+		        <p>
+		            No resources are currently available.
+		        </p>
+		
+		    <%
+		        }
+		    %>
+		
+		</div>
 
             <button
                 type="submit"
