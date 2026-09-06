@@ -1,5 +1,6 @@
 package com.event.scheduler.dao;
 
+import java.sql.Connection;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -9,6 +10,9 @@ public interface BookingDAO {
 
 //	create a new booking
     boolean addBooking(Booking booking);
+    
+//  creates a booking and return the newly generated booking id
+    int addBooking(Booking booking, Connection connection);
 
 //  Find one booking with id
     Booking getBookingById(int bookingId);
