@@ -68,16 +68,23 @@ public class LoginServlet extends HttpServlet {
 
             HttpSession session = request.getSession();
 
-            session.setAttribute("loggedInUser", user);
+            session.setAttribute(
+                    "loggedInUser",
+                    user
+            );
 
             // Redirect based on role
             if ("ADMIN".equalsIgnoreCase(user.getRole())) {
 
-                response.sendRedirect("dashboard.jsp");
+                response.sendRedirect(
+                        request.getContextPath() + "/admin"
+                );
 
             } else {
 
-                response.sendRedirect("dashboard.jsp");
+                response.sendRedirect(
+                        request.getContextPath() + "/dashboard.jsp"
+                );
             }
 
         } else {

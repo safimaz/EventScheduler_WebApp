@@ -388,7 +388,6 @@ public class BookingServiceImpl
         }
     }
     
-    
     @Override
     public Booking getBookingById(int bookingId) {
 
@@ -490,4 +489,65 @@ public class BookingServiceImpl
         return bookingDAO
                 .markBookingAsExpired(bookingId);
     }
+
+    @Override
+    public boolean approveBooking(int bookingId) {
+
+        // Get the booking
+        Booking booking =
+                bookingDAO.getBookingById(bookingId);
+
+        // Booking must exist
+        if (booking == null) {
+            return false;
+        }
+
+        // Only PENDING bookings can be approved
+        if (!"PENDING".equalsIgnoreCase(
+                booking.getStatus())) {
+
+            return false;
+        }
+
+        // Recheck room availability
+        boolean roomAvailable =
+                bookingDAO.isRoomAvailable(
+                        booking.getRoomId(),
+                        booking.getStartTime(),
+                        booking.getEndTime());
+
+        if (!roomAvailable) {
+            return false;
+        }
+
+        // Get resources associated with this booking
+        List<BookingResource> bookingResources =
+                bookingResourceDAO.getResourcesByBooking(
+                        bookingId);
+
+        // Recheck resource availability
+        if (bookingResources != null) {
+
+            for (BookingResource bookingResource
+                    : bookingResources) {
+
+                boolean resourceAvailable =
+                        bookingResourceDAO.isResourceAvailable(
+                                bookingResource.getResourceId(),
+                                bookingResource.getQuantity(),
+                                booking.getStartTime(),
+                                booking.getEndTime());
+
+                if (!resourceAvailable) {
+                    return false;
+                }
+            }
+        }
+
+        // Everything is available
+        return bookingDAO.updateBookingStatus(
+                bookingId,
+                "CONFIRMED");
+    }
+
 }

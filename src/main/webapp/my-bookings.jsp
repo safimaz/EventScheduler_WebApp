@@ -187,7 +187,7 @@
 
                 <div class="booking-info">
 
-                    <strong>Room ID:</strong>
+                    <strong>Room Name:</strong>
                     <%= booking.getRoomId() %>
 
                 </div>
