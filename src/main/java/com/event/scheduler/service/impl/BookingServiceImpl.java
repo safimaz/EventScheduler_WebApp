@@ -548,6 +548,27 @@ public class BookingServiceImpl
         return bookingDAO.updateBookingStatus(
                 bookingId,
                 "CONFIRMED");
+        
     }
+    
+    @Override
+    public void cleanupExpiredBookings() {
+     
+        List<Booking> expiredBookings =
+                bookingDAO.getExpiredPendingBookings();
+     
+        if (expiredBookings == null ||
+                expiredBookings.isEmpty()) {
+     
+            return;
+        }
+     
+        for (Booking booking : expiredBookings) {
+     
+            bookingDAO.markBookingAsExpired(
+                    booking.getBookingId());
+        }
+    }
+    
 
 }

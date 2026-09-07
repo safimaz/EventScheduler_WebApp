@@ -40,4 +40,5 @@ public interface BookingService {
     boolean markBookingAsExpired(int bookingId);
     
     boolean approveBooking(int bookingId);
+    void cleanupExpiredBookings();
 }

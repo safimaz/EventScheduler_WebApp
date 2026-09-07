@@ -65,87 +65,29 @@ public class BookingCleanupListener
     }
  
     private void cleanupExpiredBookings() {
- 
+    	 
         try {
- 
-            List<Booking> expiredBookings =
-
-                    bookingService
-
-                            .getExpiredPendingBookings();
- 
-            if (expiredBookings == null ||
-
-                    expiredBookings.isEmpty()) {
- 
-                System.out.println(
-
-                        "Booking Cleanup: "
-
-                        + "No expired bookings found."
-
-                );
- 
-                return;
-
-            }
- 
-            for (Booking booking :
-
-                    expiredBookings) {
- 
-                boolean expired =
-
-                        bookingService
-
-                                .markBookingAsExpired(
-
-                                        booking.getBookingId()
-
-                                );
- 
-                if (expired) {
- 
-                    System.out.println(
-
-                            "Booking #"
-
-                            + booking.getBookingId()
-
-                            + " marked as EXPIRED."
-
-                    );
- 
-                } else {
- 
-                    System.out.println(
-
-                            "Unable to expire Booking #"
-
-                            + booking.getBookingId()
-
-                    );
-
-                }
-
-            }
- 
-        } catch (Exception e) {
- 
-            System.err.println(
-
-                    "Error during booking cleanup."
-
+     
+            bookingService.cleanupExpiredBookings();
+     
+            System.out.println(
+                    "Booking Cleanup completed."
             );
- 
+     
+        } catch (Exception e) {
+     
+            System.err.println(
+                    "Error during booking cleanup."
+            );
+     
             e.printStackTrace();
-
         }
-
     }
+    
  
+    
     @Override
-
+    
     public void contextDestroyed(
 
             ServletContextEvent event) {
