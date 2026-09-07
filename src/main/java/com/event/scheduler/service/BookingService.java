@@ -38,7 +38,7 @@ public interface BookingService {
     List<Booking> getExpiredPendingBookings();
 
     boolean markBookingAsExpired(int bookingId);
-    
+
     boolean approveBooking(int bookingId);
     void cleanupExpiredBookings();
 }

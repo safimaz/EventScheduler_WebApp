@@ -38,15 +38,7 @@ public class BookingServiceImpl
         // 1. Basic validation
         // -----------------------------------------
 
-        if (booking == null) {
-            return false;
-        }
-
-        if (booking.getRoomId() <= 0) {
-            return false;
-        }
-
-        if (booking.getUserId() <= 0) {
+        if ((booking == null) || (booking.getRoomId() <= 0) || (booking.getUserId() <= 0)) {
             return false;
         }
 
@@ -185,11 +177,7 @@ public class BookingServiceImpl
         // 1. Basic booking validation
         // -----------------------------------------
 
-        if (booking == null) {
-            return false;
-        }
-
-        if (booking.getRoomId() <= 0 ||
+        if ((booking == null) || booking.getRoomId() <= 0 ||
                 booking.getUserId() <= 0) {
 
             return false;
@@ -387,7 +375,7 @@ public class BookingServiceImpl
             return false;
         }
     }
-    
+
     @Override
     public Booking getBookingById(int bookingId) {
 
@@ -441,10 +429,23 @@ public class BookingServiceImpl
     @Override
     public boolean cancelBooking(int bookingId) {
 
-        if (bookingId <= 0) {
+        // Get the booking
+        Booking booking =
+                bookingDAO.getBookingById(bookingId);
+
+        // Booking must exist
+        // Only PENDING or CONFIRMED bookings
+        // can be cancelled
+        if ((booking == null) || (!"PENDING".equalsIgnoreCase(
+                booking.getStatus())
+    &&
+                !"CONFIRMED".equalsIgnoreCase(
+                        booking.getStatus()))) {
+
             return false;
         }
 
+        // Cancel the booking
         return bookingDAO.cancelBooking(bookingId);
     }
 
@@ -456,12 +457,7 @@ public class BookingServiceImpl
 
         if (roomId <= 0 ||
                 startTime == null ||
-                endTime == null) {
-
-            return false;
-        }
-
-        if (!endTime.isAfter(startTime)) {
+                endTime == null || !endTime.isAfter(startTime)) {
             return false;
         }
 
@@ -498,12 +494,8 @@ public class BookingServiceImpl
                 bookingDAO.getBookingById(bookingId);
 
         // Booking must exist
-        if (booking == null) {
-            return false;
-        }
-
         // Only PENDING bookings can be approved
-        if (!"PENDING".equalsIgnoreCase(
+        if ((booking == null) || !"PENDING".equalsIgnoreCase(
                 booking.getStatus())) {
 
             return false;
@@ -548,27 +540,27 @@ public class BookingServiceImpl
         return bookingDAO.updateBookingStatus(
                 bookingId,
                 "CONFIRMED");
-        
+
     }
-    
+
     @Override
     public void cleanupExpiredBookings() {
-     
+
         List<Booking> expiredBookings =
                 bookingDAO.getExpiredPendingBookings();
-     
+
         if (expiredBookings == null ||
                 expiredBookings.isEmpty()) {
-     
+
             return;
         }
-     
+
         for (Booking booking : expiredBookings) {
-     
+
             bookingDAO.markBookingAsExpired(
                     booking.getBookingId());
         }
     }
-    
+
 
 }

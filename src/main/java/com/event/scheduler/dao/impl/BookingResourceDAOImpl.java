@@ -34,7 +34,7 @@ public class BookingResourceDAOImpl implements BookingResourceDAO {
             return false;
         }
     }
-    
+
     @Override
     public boolean addBookingResources(
             List<BookingResource> bookingResources,
@@ -88,7 +88,7 @@ public class BookingResourceDAOImpl implements BookingResourceDAO {
             return false;
         }
     }
-    
+
 
     @Override
     public boolean addBookingResources(List<BookingResource> bookingResources) {

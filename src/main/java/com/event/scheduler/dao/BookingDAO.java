@@ -10,7 +10,7 @@ public interface BookingDAO {
 
 //	create a new booking
     boolean addBooking(Booking booking);
-    
+
 //  creates a booking and return the newly generated booking id
     int addBooking(Booking booking, Connection connection);
 
@@ -26,7 +26,7 @@ public interface BookingDAO {
 //  Find booking for a room
     List<Booking> getBookingsByRoom(int roomId);
 
-//  Find PENDING/CONFIRMED 
+//  Find PENDING/CONFIRMED
     List<Booking> getBookingsByStatus(String status);
 
 //  APPROVE/REJECT a booking

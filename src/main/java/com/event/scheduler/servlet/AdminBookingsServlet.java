@@ -10,13 +10,11 @@ import com.event.scheduler.model.BookingResource;
 import com.event.scheduler.model.Resource;
 import com.event.scheduler.model.Room;
 import com.event.scheduler.model.User;
-
 import com.event.scheduler.service.BookingResourceService;
 import com.event.scheduler.service.BookingService;
 import com.event.scheduler.service.ResourceService;
 import com.event.scheduler.service.RoomService;
 import com.event.scheduler.service.UserService;
-
 import com.event.scheduler.service.impl.BookingResourceServiceImpl;
 import com.event.scheduler.service.impl.BookingServiceImpl;
 import com.event.scheduler.service.impl.ResourceServiceImpl;

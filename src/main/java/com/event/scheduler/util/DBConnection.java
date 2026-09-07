@@ -13,12 +13,12 @@ public class DBConnection {
     private static final String USERNAME =
 //            "EVENT_SCHEDULER";
 			"C##itcuser";
-    
-    
+
+
     private static final String PASSWORD =
 //            "EventScheduler2026";
 			"itcuser";
-    
+
     private DBConnection() {
         // Prevent object creation
     }

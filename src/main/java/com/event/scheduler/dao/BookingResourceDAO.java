@@ -11,7 +11,7 @@ public interface BookingResourceDAO {
 //	Attach one resource to a booking
     boolean addBookingResource(
             BookingResource bookingResource);
-    
+
     boolean addBookingResources(
     	    List<BookingResource> bookingResources,
     	    Connection connection);
@@ -37,7 +37,7 @@ public interface BookingResourceDAO {
             int bookingId,
             int resourceId);
 
-//  Check whether enough resource quantity is available 
+//  Check whether enough resource quantity is available
     boolean isResourceAvailable(
             int resourceId,
             int quantity,

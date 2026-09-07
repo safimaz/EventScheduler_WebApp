@@ -110,11 +110,11 @@ public class BookingDAOImpl implements BookingDAO {
         }
 
         return -1;
-        
+
 //        positive number → booking successfully created
 //        -1              → booking creation failed
     }
-    
+
     @Override
     public Booking getBookingById(int bookingId) {
 
