@@ -534,6 +534,60 @@
 
             font-size: 11px;
         }
+        /* =========================================
+   FORGOT PASSWORD LINK
+========================================= */
+
+.forgot-password {
+
+    text-align: right;
+
+    margin-top: -10px;
+
+    margin-bottom: 20px;
+
+    font-size: 13px;
+}
+
+.forgot-password a {
+
+    color: #2563eb;
+
+    font-weight: 600;
+}
+
+.forgot-password a:hover {
+
+    text-decoration: underline;
+}
+        /* =========================================
+   REGISTER LINK
+========================================= */
+
+.register-link {
+
+    text-align: center;
+
+    margin-top: 20px;
+
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+.register-link a {
+
+    color: #2563eb;
+
+    font-weight: 600;
+
+    margin-left: 4px;
+}
+
+.register-link a:hover {
+
+    text-decoration: underline;
+}
 
 
         /* =========================================
@@ -748,6 +802,13 @@
                     </div>
 
                 </div>
+                <div class="forgot-password">
+
+    <a href="forgot-password.jsp">
+        Forgot Password?
+    </a>
+
+</div>
 
 
 
@@ -761,6 +822,17 @@
 
 
             </form>
+            <!-- REGISTER LINK -->
+
+<div class="register-link">
+
+    Don't have an account?
+
+    <a href="register.jsp">
+        Create an account
+    </a>
+
+</div>
 
 
 
