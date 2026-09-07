@@ -940,28 +940,28 @@
 
                 <div class="card">
 
-                    <div class="card-icon">
-                        🔔
-                    </div>
-
-                    <h3>
-                        Notifications
-                    </h3>
-
-                    <p>
-
-                        Stay updated with booking confirmations,
-                        changes and important scheduling alerts.
-
-                    </p>
-
-                    <a href="notifications.jsp">
-
-                        Notifications →
-
-                    </a>
-
-                </div>
+				    <div class="card-icon">
+				        📅
+				    </div>
+				
+				    <h3>
+				        Schedule
+				    </h3>
+				
+				    <p>
+				
+				        View room availability, confirmed
+				        bookings and daily room schedules.
+				
+				    </p>
+				
+				    <a href="schedule">
+				
+				        View Schedule →
+				
+				    </a>
+				
+				</div>
 
 
 
