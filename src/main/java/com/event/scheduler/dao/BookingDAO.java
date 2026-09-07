@@ -1,6 +1,7 @@
 package com.event.scheduler.dao;
 
 import java.sql.Connection;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -50,4 +51,7 @@ public interface BookingDAO {
 
 //  Change PENDING->EXPIRED
     boolean markBookingAsExpired(int bookingId);
+    
+//  Retrieve bookings based on specific date
+    List<Booking> getBookingsByDate(LocalDate date);
 }
