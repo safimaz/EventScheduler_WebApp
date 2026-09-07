@@ -6,6 +6,7 @@
 <%@ page import="java.time.LocalDate" %>
 <%@ page import="java.time.LocalDateTime" %>
 <%@ page import="com.event.scheduler.model.Booking" %>
+<%@ page import="com.event.scheduler.model.Room" %>
 <%@ page import="com.event.scheduler.model.User" %>
 
 <%
@@ -23,12 +24,19 @@
     List<Booking> bookings =
         (List<Booking>) request.getAttribute("bookings");
 
+    List<Room> rooms =
+        (List<Room>) request.getAttribute("rooms");
+
     if (selectedDate == null) {
         selectedDate = LocalDate.now();
     }
 
     if (bookings == null) {
         bookings = new java.util.ArrayList<>();
+    }
+
+    if (rooms == null) {
+        rooms = new java.util.ArrayList<>();
     }
 
     String errorMessage =
@@ -96,6 +104,7 @@
             font-size: 20px;
             font-weight: 700;
             color: #0f172a;
+            letter-spacing: -0.3px;
         }
 
         .user-section {
@@ -120,11 +129,13 @@
         .user-details {
             display: flex;
             flex-direction: column;
+            align-items: flex-start;
         }
 
         .user-name {
             font-size: 14px;
             font-weight: 600;
+            color: #0f172a;
         }
 
         .user-label {
@@ -134,17 +145,17 @@
         }
 
         /* =========================
-           CONTAINER
+           MAIN CONTAINER
         ========================= */
 
         .container {
-            max-width: 1250px;
+            max-width: 1350px;
             margin: 0 auto;
             padding: 38px 28px 60px;
         }
 
         /* =========================
-           BACK
+           BACK LINK
         ========================= */
 
         .back {
@@ -156,6 +167,7 @@
             text-decoration: none;
             font-size: 14px;
             font-weight: 500;
+            transition: color 0.2s ease;
         }
 
         .back:hover {
@@ -163,19 +175,23 @@
         }
 
         /* =========================
-           HEADER
+           PAGE HEADER
         ========================= */
 
         .page-header {
             display: flex;
-            justify-content: space-between;
             align-items: flex-end;
+            justify-content: space-between;
+            gap: 25px;
             margin-bottom: 28px;
         }
 
         .page-title-section h1 {
             font-size: 30px;
+            line-height: 1.2;
             font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.6px;
         }
 
         .page-title-section p {
@@ -228,7 +244,7 @@
         }
 
         /* =========================
-           ERROR
+           ERROR MESSAGE
         ========================= */
 
         .error {
@@ -297,6 +313,11 @@
             border: 1px solid #fecaca;
         }
 
+        .maintenance-box {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+        }
+
         /* =========================
            SCHEDULE TABLE
         ========================= */
@@ -311,22 +332,23 @@
 
         .schedule-table {
             width: 100%;
-            min-width: 1100px;
+            min-width: 1200px;
             border-collapse: collapse;
         }
 
         .schedule-table th {
             background: #f8fafc;
-            padding: 14px 12px;
+            padding: 14px 10px;
             border-bottom: 1px solid #e2e8f0;
             border-right: 1px solid #f1f5f9;
             font-size: 12px;
             color: #475569;
             text-align: center;
+            white-space: nowrap;
         }
 
         .schedule-table th.room-column {
-            min-width: 180px;
+            min-width: 210px;
             text-align: left;
             padding-left: 20px;
         }
@@ -337,7 +359,7 @@
             border-right: 1px solid #f1f5f9;
             text-align: center;
             vertical-align: middle;
-            height: 75px;
+            height: 78px;
         }
 
         .room-name {
@@ -347,12 +369,44 @@
             color: #0f172a;
         }
 
+        .room-location {
+            display: block;
+            margin-top: 4px;
+            font-size: 11px;
+            font-weight: 400;
+            color: #94a3b8;
+        }
+
+        .room-status {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 3px 7px;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .room-available {
+            background: #f0fdf4;
+            color: #15803d;
+        }
+
+        .room-maintenance {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .room-inactive {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
         /* =========================
-           SLOT
+           SLOTS
         ========================= */
 
         .slot {
-            min-height: 55px;
+            min-height: 58px;
             border-radius: 7px;
             display: flex;
             flex-direction: column;
@@ -374,6 +428,12 @@
             color: #b91c1c;
         }
 
+        .unavailable {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            color: #64748b;
+        }
+
         .slot-title {
             font-weight: 700;
         }
@@ -384,15 +444,20 @@
         }
 
         /* =========================
-           EMPTY
+           NO ROOMS
         ========================= */
 
         .empty {
             background: #ffffff;
             border: 1px solid #e2e8f0;
             border-radius: 10px;
-            padding: 50px 30px;
+            padding: 60px 30px;
             text-align: center;
+        }
+
+        .empty-icon {
+            font-size: 35px;
+            margin-bottom: 15px;
         }
 
         .empty h2 {
@@ -517,11 +582,15 @@
         </a>
 
 
+        <!-- PAGE HEADER -->
+
         <div class="page-header">
 
             <div class="page-title-section">
 
-                <h1>Room Schedule</h1>
+                <h1>
+                    Room Schedule
+                </h1>
 
                 <p>
                     View room availability and confirmed bookings.
@@ -609,26 +678,38 @@
 
             </div>
 
+            <div class="legend-item">
+
+                <div class="legend-box maintenance-box"></div>
+
+                Unavailable
+
+            </div>
+
         </div>
 
 
         <%
-            if (bookings.isEmpty()) {
+            if (rooms.isEmpty()) {
         %>
 
             <!-- =========================
-                 NO BOOKINGS
+                 NO ROOMS
             ========================= -->
 
             <div class="empty">
 
+                <div class="empty-icon">
+                    🏢
+                </div>
+
                 <h2>
-                    No confirmed bookings
+                    No rooms available
                 </h2>
 
                 <p>
-                    There are no confirmed room bookings
-                    for the selected date.
+                    There are currently no rooms configured
+                    in the system.
                 </p>
 
             </div>
@@ -636,6 +717,7 @@
         <%
             } else {
         %>
+
 
             <!-- =========================
                  SCHEDULE TABLE
@@ -653,75 +735,100 @@
                                 Room
                             </th>
 
-                            <th>
-                                09:00 - 10:00
-                            </th>
+                            <%
+                                for (int hour = 9;
+                                     hour < 20;
+                                     hour++) {
+                            %>
 
-                            <th>
-                                10:00 - 11:00
-                            </th>
+                                <th>
+                                    <%= String.format(
+                                            "%02d:00",
+                                            hour) %>
+                                    -
+                                    <%= String.format(
+                                            "%02d:00",
+                                            hour + 1) %>
+                                </th>
 
-                            <th>
-                                11:00 - 12:00
-                            </th>
-
-                            <th>
-                                12:00 - 13:00
-                            </th>
-
-                            <th>
-                                13:00 - 14:00
-                            </th>
-
-                            <th>
-                                14:00 - 15:00
-                            </th>
-
-                            <th>
-                                15:00 - 16:00
-                            </th>
-
-                            <th>
-                                16:00 - 17:00
-                            </th>
-                            
-                            <th>
-                                17:00 - 18:00
-                            </th>
-                            
-                            <th>
-                                18:00 - 19:00
-                            </th>
-                            
-                            <th>
-                                19:00 - 20:00
-                            </th>
-                            
+                            <%
+                                }
+                            %>
 
                         </tr>
 
                     </thead>
 
+
                     <tbody>
 
                         <%
-                            java.util.Set<Integer> roomIds =
-                                new java.util.LinkedHashSet<>();
+                            for (Room room : rooms) {
 
-                            for (Booking booking : bookings) {
-                                roomIds.add(
-                                    booking.getRoomId()
-                                );
-                            }
+                                boolean roomAvailable =
+                                    "AVAILABLE".equalsIgnoreCase(
+                                        room.getStatus());
 
-                            for (Integer roomId : roomIds) {
+                                boolean roomMaintenance =
+                                    "MAINTENANCE".equalsIgnoreCase(
+                                        room.getStatus());
                         %>
 
                             <tr>
 
+                                <!-- ROOM INFORMATION -->
+
                                 <td class="room-name">
 
-                                    Room #<%= roomId %>
+                                    <%= room.getRoomName() %>
+
+                                    <%
+                                        if (room.getLocation()
+                                                != null
+                                            &&
+                                            !room.getLocation()
+                                                .trim()
+                                                .isEmpty()) {
+                                    %>
+
+                                        <span class="room-location">
+
+                                            <%= room.getLocation() %>
+
+                                        </span>
+
+                                    <%
+                                        }
+                                    %>
+
+
+                                    <%
+                                        if (roomAvailable) {
+                                    %>
+
+                                        <span class="room-status room-available">
+                                            AVAILABLE
+                                        </span>
+
+                                    <%
+                                        } else if (roomMaintenance) {
+                                    %>
+
+                                        <span class="room-status room-maintenance">
+                                            MAINTENANCE
+                                        </span>
+
+                                    <%
+                                        } else {
+                                    %>
+
+                                        <span class="room-status room-inactive">
+                                            INACTIVE
+                                        </span>
+
+                                    <%
+                                        }
+                                    %>
 
                                 </td>
 
@@ -742,11 +849,16 @@
                                         Booking occupiedBooking =
                                             null;
 
+                                        /*
+                                         * Find a confirmed booking
+                                         * for this room and slot.
+                                         */
+
                                         for (Booking booking :
                                                 bookings) {
 
                                             if (booking.getRoomId()
-                                                    == roomId) {
+                                                    == room.getRoomId()) {
 
                                                 LocalDateTime
                                                     bookingStart =
@@ -757,6 +869,12 @@
                                                     bookingEnd =
                                                         booking
                                                             .getEndTime();
+
+                                                /*
+                                                 * Check whether
+                                                 * booking overlaps
+                                                 * this hourly slot.
+                                                 */
 
                                                 if (bookingStart
                                                         .isBefore(
@@ -775,10 +893,26 @@
                                         }
                                 %>
 
+
+                                    <!-- SLOT -->
+
                                     <td>
 
                                         <%
-                                            if (occupiedBooking
+                                            if (!roomAvailable) {
+                                        %>
+
+                                            <div class="slot unavailable">
+
+                                                <div class="slot-title">
+                                                    UNAVAILABLE
+                                                </div>
+
+                                            </div>
+
+                                        <%
+                                            } else if (
+                                                occupiedBooking
                                                     != null) {
                                         %>
 
@@ -821,6 +955,7 @@
                                         %>
 
                                     </td>
+
 
                                 <%
                                     }
