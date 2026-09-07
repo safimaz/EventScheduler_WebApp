@@ -1,5 +1,6 @@
 package com.event.scheduler.dao;
 
+import java.sql.Connection;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -10,6 +11,10 @@ public interface BookingResourceDAO {
 //	Attach one resource to a booking
     boolean addBookingResource(
             BookingResource bookingResource);
+    
+    boolean addBookingResources(
+    	    List<BookingResource> bookingResources,
+    	    Connection connection);
 
 //  Attach multiple resources
     boolean addBookingResources(

@@ -34,6 +34,61 @@ public class BookingResourceDAOImpl implements BookingResourceDAO {
             return false;
         }
     }
+    
+    @Override
+    public boolean addBookingResources(
+            List<BookingResource> bookingResources,
+            Connection connection) {
+
+        if (bookingResources == null ||
+                bookingResources.isEmpty()) {
+
+            return true;
+        }
+
+        String sql = "INSERT INTO booking_resources "
+                + "(booking_id, resource_id, quantity) "
+                + "VALUES (?, ?, ?)";
+
+        try (PreparedStatement statement =
+                connection.prepareStatement(sql)) {
+
+            for (BookingResource bookingResource
+                    : bookingResources) {
+
+                statement.setInt(
+                        1,
+                        bookingResource.getBookingId());
+
+                statement.setInt(
+                        2,
+                        bookingResource.getResourceId());
+
+                statement.setInt(
+                        3,
+                        bookingResource.getQuantity());
+
+                statement.addBatch();
+            }
+
+            int[] results =
+                    statement.executeBatch();
+
+            for (int result : results) {
+
+                if (result == 0) {
+                    return false;
+                }
+            }
+
+            return true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
 
     @Override
     public boolean addBookingResources(List<BookingResource> bookingResources) {

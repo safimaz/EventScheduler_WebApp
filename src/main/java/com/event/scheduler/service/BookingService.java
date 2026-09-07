@@ -4,10 +4,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.event.scheduler.model.Booking;
+import com.event.scheduler.model.BookingResource;
 
 public interface BookingService {
 
     boolean createBooking(Booking booking);
+
+    boolean createBooking(
+            Booking booking,
+            List<BookingResource> bookingResources);
 
     Booking getBookingById(int bookingId);
 
@@ -19,15 +24,20 @@ public interface BookingService {
 
     List<Booking> getBookingsByStatus(String status);
 
-    boolean updateBookingStatus(int bookingId, String status);
+    boolean updateBookingStatus(
+            int bookingId,
+            String status);
 
     boolean cancelBooking(int bookingId);
 
-    boolean isRoomAvailable(int roomId,
-                            LocalDateTime startTime,
-                            LocalDateTime endTime);
+    boolean isRoomAvailable(
+            int roomId,
+            LocalDateTime startTime,
+            LocalDateTime endTime);
 
     List<Booking> getExpiredPendingBookings();
 
     boolean markBookingAsExpired(int bookingId);
+    
+    boolean approveBooking(int bookingId);
 }

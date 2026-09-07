@@ -2,9 +2,11 @@ package com.event.scheduler.servlet;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.event.scheduler.model.Booking;
+import com.event.scheduler.model.BookingResource;
 import com.event.scheduler.model.Resource;
 import com.event.scheduler.model.Room;
 import com.event.scheduler.model.User;
@@ -45,8 +47,10 @@ public class BookingServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
+        HttpSession session =
+                request.getSession(false);
 
+        // Check whether user is logged in
         if (session == null ||
                 session.getAttribute("loggedInUser") == null) {
 
@@ -54,10 +58,12 @@ public class BookingServlet extends HttpServlet {
             return;
         }
 
+        // Load rooms and resources
         loadFormData(request);
 
+        // Open booking form
         request.getRequestDispatcher("book-room.jsp")
-               .forward(request, response);
+                .forward(request, response);
     }
 
     @Override
@@ -66,8 +72,10 @@ public class BookingServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
+        HttpSession session =
+                request.getSession(false);
 
+        // Check whether user is logged in
         if (session == null ||
                 session.getAttribute("loggedInUser") == null) {
 
@@ -86,21 +94,20 @@ public class BookingServlet extends HttpServlet {
                             "loggedInUser");
 
             // ------------------------------------
-            // Read form values
+            // Read room and booking information
             // ------------------------------------
 
-            int roomId = Integer.parseInt(
-                    request.getParameter("roomId"));
+            int roomId =
+                    Integer.parseInt(
+                            request.getParameter("roomId"));
 
             LocalDateTime startTime =
                     LocalDateTime.parse(
-                            request.getParameter(
-                                    "startTime"));
+                            request.getParameter("startTime"));
 
             LocalDateTime endTime =
                     LocalDateTime.parse(
-                            request.getParameter(
-                                    "endTime"));
+                            request.getParameter("endTime"));
 
             int attendeeCount =
                     Integer.parseInt(
@@ -111,10 +118,56 @@ public class BookingServlet extends HttpServlet {
                     request.getParameter("purpose");
 
             // ------------------------------------
+            // Read selected resources
+            // ------------------------------------
+
+            String[] selectedResourceIds =
+                    request.getParameterValues("resourceId");
+
+            List<BookingResource> bookingResources =
+                    new ArrayList<>();
+
+            if (selectedResourceIds != null) {
+
+                for (String resourceIdValue
+                        : selectedResourceIds) {
+
+                    int resourceId =
+                            Integer.parseInt(
+                                    resourceIdValue);
+
+                    String quantityParameter =
+                            "resourceQuantity_"
+                            + resourceId;
+
+                    String quantityValue =
+                            request.getParameter(
+                                    quantityParameter);
+
+                    int quantity =
+                            Integer.parseInt(
+                                    quantityValue);
+
+                    BookingResource bookingResource =
+                            new BookingResource();
+
+                    bookingResource.setResourceId(
+                            resourceId);
+
+                    bookingResource.setQuantity(
+                            quantity);
+
+                    bookingResources.add(
+                            bookingResource);
+                }
+            }
+
+            // ------------------------------------
             // Create Booking object
             // ------------------------------------
 
-            Booking booking = new Booking();
+            Booking booking =
+                    new Booking();
 
             booking.setRoomId(roomId);
 
@@ -130,16 +183,18 @@ public class BookingServlet extends HttpServlet {
 
             booking.setPurpose(purpose);
 
-            // Status will be set to PENDING
-            // inside BookingServiceImpl
-
             // ------------------------------------
-            // Create booking
+            // Create booking + resources
             // ------------------------------------
 
             boolean created =
                     bookingService.createBooking(
-                            booking);
+                            booking,
+                            bookingResources);
+
+            // ------------------------------------
+            // Booking successful
+            // ------------------------------------
 
             if (created) {
 
@@ -147,15 +202,22 @@ public class BookingServlet extends HttpServlet {
                         "successMessage",
                         "Booking request submitted successfully.");
 
-                response.sendRedirect("my-bookings");
+                response.sendRedirect(
+                        "my-bookings");
+
                 return;
             }
+
+            // ------------------------------------
+            // Booking failed
+            // ------------------------------------
 
             request.setAttribute(
                     "errorMessage",
                     "Unable to create booking. "
                     + "Please check room availability, "
-                    + "room capacity and selected time.");
+                    + "room capacity, time and "
+                    + "resource availability.");
 
         } catch (Exception e) {
 
@@ -167,10 +229,12 @@ public class BookingServlet extends HttpServlet {
                     + "Please check all fields.");
         }
 
+        // Reload rooms/resources if booking fails
         loadFormData(request);
 
-        request.getRequestDispatcher("book-room.jsp")
-               .forward(request, response);
+        request.getRequestDispatcher(
+                "book-room.jsp")
+                .forward(request, response);
     }
 
     private void loadFormData(
@@ -182,7 +246,12 @@ public class BookingServlet extends HttpServlet {
         List<Resource> resources =
                 resourceService.getAvailableResources();
 
-        request.setAttribute("rooms", rooms);
-        request.setAttribute("resources", resources);
+        request.setAttribute(
+                "rooms",
+                rooms);
+
+        request.setAttribute(
+                "resources",
+                resources);
     }
 }
