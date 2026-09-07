@@ -1,5 +1,6 @@
 package com.event.scheduler.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -40,5 +41,9 @@ public interface BookingService {
     boolean markBookingAsExpired(int bookingId);
 
     boolean approveBooking(int bookingId);
+    
     void cleanupExpiredBookings();
+    
+    List<Booking> getBookingsByDate(LocalDate date);
+    
 }

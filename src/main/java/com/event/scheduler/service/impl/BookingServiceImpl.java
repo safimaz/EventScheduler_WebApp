@@ -1,7 +1,9 @@
 package com.event.scheduler.service.impl;
 
 import java.sql.Connection;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.event.scheduler.dao.BookingDAO;
@@ -562,5 +564,15 @@ public class BookingServiceImpl
         }
     }
 
+    @Override
+    public List<Booking> getBookingsByDate(LocalDate date) {
+
+        if (date == null) {
+            return new ArrayList<>();
+        }
+
+        return bookingDAO.getBookingsByDate(date);
+    }
+    
 
 }
