@@ -1,5 +1,5 @@
 package com.event.scheduler.dao.impl;
-
+import java.time.LocalDate;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -487,4 +487,91 @@ public class BookingDAOImpl implements BookingDAO {
 
         return booking;
     }
+    
+    @Override
+
+    public List<Booking> getBookingsByDate(LocalDate date) {
+     
+        List<Booking> bookings = new ArrayList<>();
+     
+        String sql =
+
+                "SELECT booking_id, room_id, user_id, "
+
+                + "start_time, end_time, attendee_count, "
+
+                + "purpose, status, created_at "
+
+                + "FROM bookings "
+
+                + "WHERE status = 'CONFIRMED' "
+
+                + "AND start_time < ? "
+
+                + "AND end_time > ? "
+
+                + "ORDER BY room_id, start_time";
+     
+        LocalDateTime startOfDay =
+
+                date.atStartOfDay();
+     
+        LocalDateTime startOfNextDay =
+
+                date.plusDays(1).atStartOfDay();
+     
+        try (Connection connection =
+
+                DBConnection.getConnection();
+     
+             PreparedStatement statement =
+
+                connection.prepareStatement(sql)) {
+     
+            statement.setTimestamp(
+
+                    1,
+
+                    Timestamp.valueOf(startOfNextDay)
+
+            );
+     
+            statement.setTimestamp(
+
+                    2,
+
+                    Timestamp.valueOf(startOfDay)
+
+            );
+     
+            try (ResultSet resultSet =
+
+                    statement.executeQuery()) {
+     
+                while (resultSet.next()) {
+     
+                    bookings.add(
+
+                            mapBooking(resultSet)
+
+                    );
+
+                }
+
+            }
+     
+        } catch (Exception e) {
+     
+            e.printStackTrace();
+
+        }
+     
+        return bookings;
+
+    }
+     
+    
+    
+    
+    
 }
