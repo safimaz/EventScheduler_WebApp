@@ -1,645 +1,516 @@
 <%@ page language="java"
-    contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+contentType="text/html; charset=UTF-8"
+pageEncoding="UTF-8"%>
 
 <%@ page import="java.util.List" %>
 <%@ page import="com.event.scheduler.model.Resource" %>
 
 <%
-    if (session.getAttribute("loggedInUser") == null) {
-        response.sendRedirect("login.jsp");
-        return;
-    }
+// Check whether user is logged in
+if (session.getAttribute("loggedInUser") == null) {
+response.sendRedirect("login.jsp");
+return;
+}
 
-    List<Resource> resources =
-        (List<Resource>) request.getAttribute("resources");
+
+List<Resource> resources =
+    (List<Resource>) request.getAttribute("resources");
+
+String keyword = request.getParameter("keyword");
+
 %>
 
 <!DOCTYPE html>
+
 <html>
 
 <head>
 
-    <meta charset="UTF-8">
+```
+<meta charset="UTF-8">
 
-    <title>Resources - EventSync</title>
+<title>Resources - EventSync</title>
 
-    <style>
+<style>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+    * {
+        box-sizing: border-box;
+    }
 
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f8fafc;
-            color: #0f172a;
-            min-height: 100vh;
-        }
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f4f6f8;
+        color: #333;
+    }
 
-        /* =========================
-           NAVBAR
-        ========================= */
+    /* NAVBAR */
+
+    .navbar {
+        background-color: #1f2937;
+        color: white;
+        padding: 18px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo {
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .back-link {
+        color: white;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+    /* MAIN CONTAINER */
+
+    .container {
+        width: 90%;
+        max-width: 1100px;
+        margin: 40px auto;
+    }
+
+    /* HEADER */
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    .page-header h1 {
+        margin: 0;
+        font-size: 30px;
+    }
+
+    .add-button {
+        background-color: #2563eb;
+        color: white;
+        padding: 11px 18px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: bold;
+    }
+
+    .add-button:hover {
+        background-color: #1d4ed8;
+    }
+
+    /* SEARCH */
+
+    .search-container {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .search-form {
+        display: flex;
+        gap: 10px;
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 11px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 15px;
+    }
+
+    .search-button {
+        padding: 11px 20px;
+        border: none;
+        background-color: #374151;
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 15px;
+    }
+
+    .search-button:hover {
+        background-color: #111827;
+    }
+
+    .clear-button {
+        padding: 11px 20px;
+        background-color: #e5e7eb;
+        color: #333;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 15px;
+    }
+
+    /* RESOURCE GRID */
+
+    .resource-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    /* RESOURCE CARD */
+
+    .resource-card {
+        background-color: white;
+        border-radius: 10px;
+        padding: 22px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .resource-card h3 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        font-size: 21px;
+    }
+
+    .resource-card p {
+        margin: 9px 0;
+        font-size: 15px;
+    }
+
+    .resource-card strong {
+        color: #374151;
+    }
+
+    /* STATUS */
+
+    .status {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .available {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+
+    .maintenance {
+        background-color: #fef3c7;
+        color: #92400e;
+    }
+
+    .inactive {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+
+    /* ACTION BUTTONS */
+
+    .actions {
+        margin-top: 18px;
+        display: flex;
+        gap: 8px;
+    }
+
+    .edit-button {
+        background-color: #f59e0b;
+        color: white;
+        padding: 8px 14px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .edit-button:hover {
+        background-color: #d97706;
+    }
+
+    .delete-button {
+        background-color: #dc2626;
+        color: white;
+        padding: 8px 14px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .delete-button:hover {
+        background-color: #b91c1c;
+    }
+
+    /* EMPTY MESSAGE */
+
+    .empty-message {
+        background-color: white;
+        padding: 40px;
+        text-align: center;
+        border-radius: 10px;
+        color: #666;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    /* ERROR MESSAGE */
+
+    .error-message {
+        background-color: #fee2e2;
+        color: #991b1b;
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+    }
+
+    /* FOOTER */
+
+    footer {
+        text-align: center;
+        padding: 25px;
+        margin-top: 50px;
+        color: #777;
+        font-size: 14px;
+    }
+
+    /* MOBILE */
+
+    @media (max-width: 600px) {
 
         .navbar {
-            height: 72px;
-            background: #ffffff;
-            border-bottom: 1px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 42px;
+            padding: 15px 20px;
         }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .brand-logo {
-            width: 40px;
-            height: 40px;
-            border-radius: 9px;
-            background: #2563eb;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            font-weight: 700;
-        }
-
-        .brand-name {
-            font-size: 20px;
-            font-weight: 700;
-            color: #0f172a;
-            letter-spacing: -0.3px;
-        }
-
-        .navbar-section {
-            color: #64748b;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        /* =========================
-           MAIN CONTAINER
-        ========================= */
 
         .container {
-            max-width: 1180px;
-            margin: 0 auto;
-            padding: 38px 28px 60px;
+            width: 92%;
         }
-
-        /* =========================
-           BACK LINK
-        ========================= */
-
-        .back {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 26px;
-            color: #64748b;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            transition: color 0.2s ease;
-        }
-
-        .back:hover {
-            color: #2563eb;
-        }
-
-        /* =========================
-           PAGE HEADER
-        ========================= */
 
         .page-header {
-            margin-bottom: 28px;
-        }
-
-        .page-header h1 {
-            font-size: 30px;
-            line-height: 1.2;
-            font-weight: 700;
-            color: #0f172a;
-            letter-spacing: -0.6px;
-        }
-
-        .page-header p {
-            margin-top: 8px;
-            font-size: 14px;
-            color: #64748b;
-        }
-
-        /* =========================
-           SEARCH SECTION
-        ========================= */
-
-        .search-box {
-            margin-bottom: 28px;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 18px;
-            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
-        }
-
-        .search-label {
-            display: block;
-            margin-bottom: 9px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #334155;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
         }
 
         .search-form {
-            display: flex;
-            gap: 10px;
+            flex-direction: column;
         }
 
-        .search-box input {
-            flex: 1;
-            min-width: 0;
-            padding: 11px 13px;
-            border: 1px solid #cbd5e1;
-            border-radius: 7px;
-            background: #ffffff;
-            color: #0f172a;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.2s ease,
-                        box-shadow 0.2s ease;
-        }
+    }
 
-        .search-box input::placeholder {
-            color: #94a3b8;
-        }
-
-        .search-box input:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
-        }
-
-        .search-box button {
-            padding: 11px 22px;
-            border: none;
-            border-radius: 7px;
-            background: #2563eb;
-            color: #ffffff;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
-
-        .search-box button:hover {
-            background: #1d4ed8;
-        }
-
-        /* =========================
-           RESOURCE GRID
-        ========================= */
-
-        .resources {
-            display: grid;
-            grid-template-columns:
-                repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        /* =========================
-           RESOURCE CARD
-        ========================= */
-
-        .resource-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 24px;
-            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
-            transition: all 0.2s ease;
-        }
-
-        .resource-card:hover {
-            border-color: #cbd5e1;
-            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
-            transform: translateY(-2px);
-        }
-
-        /* =========================
-           RESOURCE CARD HEADER
-        ========================= */
-
-        .resource-header {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding-bottom: 18px;
-            margin-bottom: 16px;
-            border-bottom: 1px solid #f1f5f9;
-        }
-
-        .resource-icon {
-            width: 42px;
-            height: 42px;
-            border-radius: 9px;
-            background: #eff6ff;
-            color: #2563eb;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 19px;
-            flex-shrink: 0;
-        }
-
-        .resource-title {
-            min-width: 0;
-        }
-
-        .resource-card h2 {
-            color: #0f172a;
-            font-size: 17px;
-            font-weight: 700;
-            line-height: 1.3;
-            word-break: break-word;
-        }
-
-        .resource-subtitle {
-            margin-top: 4px;
-            color: #94a3b8;
-            font-size: 12px;
-        }
-
-        /* =========================
-           RESOURCE INFORMATION
-        ========================= */
-
-        .resource-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-            padding: 10px 0;
-            border-bottom: 1px solid #f8fafc;
-            font-size: 14px;
-        }
-
-        .resource-info:last-child {
-            border-bottom: none;
-        }
-
-        .resource-info strong {
-            color: #64748b;
-            font-size: 13px;
-            font-weight: 500;
-        }
-
-        .resource-info {
-            color: #334155;
-        }
-
-        /* =========================
-           STATUS BADGES
-        ========================= */
-
-        .available,
-        .maintenance,
-        .inactive {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        .available {
-            color: #15803d;
-            background: #f0fdf4;
-        }
-
-        .maintenance {
-            color: #b45309;
-            background: #fffbeb;
-        }
-
-        .inactive {
-            color: #dc2626;
-            background: #fef2f2;
-        }
-
-        .available::before,
-        .maintenance::before,
-        .inactive::before {
-            content: "";
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: currentColor;
-        }
-
-        /* =========================
-           EMPTY STATE
-        ========================= */
-
-        .empty-state {
-            grid-column: 1 / -1;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 65px 30px;
-            text-align: center;
-            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
-        }
-
-        .empty-icon {
-            width: 58px;
-            height: 58px;
-            margin: 0 auto 18px;
-            border-radius: 12px;
-            background: #eff6ff;
-            color: #2563eb;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 25px;
-        }
-
-        .empty-state h2 {
-            color: #0f172a;
-            font-size: 20px;
-            margin-bottom: 8px;
-        }
-
-        .empty-state p {
-            color: #64748b;
-            font-size: 14px;
-        }
-
-        /* =========================
-           FOOTER
-        ========================= */
-
-        .footer {
-            border-top: 1px solid #e2e8f0;
-            background: #ffffff;
-            padding: 20px 30px;
-            text-align: center;
-            color: #94a3b8;
-            font-size: 12px;
-        }
-
-        /* =========================
-           RESPONSIVE
-        ========================= */
-
-        @media (max-width: 650px) {
-
-            .navbar {
-                padding: 0 20px;
-            }
-
-            .container {
-                padding: 28px 18px 45px;
-            }
-
-            .navbar-section {
-                display: none;
-            }
-
-            .search-form {
-                flex-direction: column;
-            }
-
-            .search-box button {
-                width: 100%;
-            }
-
-            .resources {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 450px) {
-
-            .brand-name {
-                font-size: 18px;
-            }
-
-            .page-header h1 {
-                font-size: 26px;
-            }
-
-            .resource-card {
-                padding: 18px;
-            }
-
-            .resource-info {
-                align-items: flex-start;
-            }
-
-        }
-
-    </style>
+</style>
+```
 
 </head>
 
 <body>
 
-    <!-- =========================
-         NAVBAR
-    ========================= -->
+```
+<!-- NAVBAR -->
 
-    <div class="navbar">
+<div class="navbar">
 
-        <div class="brand">
-
-            <div class="brand-logo">
-                ES
-            </div>
-
-            <div class="brand-name">
-                EventSync
-            </div>
-
-        </div>
-
-        <div class="navbar-section">
-            Resources
-        </div>
-
+    <div class="logo">
+        EventSync
     </div>
 
+    <a href="dashboard.jsp" class="back-link">
+        ← Back to Dashboard
+    </a>
 
-    <!-- =========================
-         MAIN CONTENT
-    ========================= -->
+</div>
 
-    <div class="container">
 
-        <a href="dashboard.jsp" class="back">
-            ← Back to Dashboard
+<!-- MAIN CONTENT -->
+
+<div class="container">
+
+    <!-- PAGE HEADER -->
+
+    <div class="page-header">
+
+        <h1>
+            Shared Resources
+        </h1>
+
+        <a href="resources?action=add"
+           class="add-button">
+            + Add Resource
         </a>
 
+    </div>
 
-        <div class="page-header">
 
-            <h1>
-                Shared Resources
-            </h1>
+    <!-- ERROR MESSAGE -->
 
-            <p>
-                Browse and check the availability of shared event resources.
-            </p>
+    <%
+        String errorMessage =
+            (String) request.getAttribute("errorMessage");
 
+        if (errorMessage != null) {
+    %>
+
+        <div class="error-message">
+            <%= errorMessage %>
         </div>
 
-
-        <div class="search-box">
-
-            <span class="search-label">
-                Search Resources
-            </span>
-
-            <form action="resources" method="get" class="search-form">
-
-                <input
-                    type="text"
-                    name="keyword"
-                    placeholder="Search resources..."
-                    value="<%= request.getParameter("keyword") != null
-                            ? request.getParameter("keyword")
-                            : "" %>"
-                >
-
-                <button type="submit">
-                    Search
-                </button>
-
-            </form>
-
-        </div>
+    <%
+        }
+    %>
 
 
-        <div class="resources">
+    <!-- SEARCH -->
 
-        <%
+    <div class="search-container">
 
-            if (resources != null && !resources.isEmpty()) {
+        <form action="resources"
+              method="get"
+              class="search-form">
 
+            <input type="text"
+                   name="keyword"
+                   class="search-input"
+                   placeholder="Search by resource name or type..."
+                   value="<%= keyword != null ? keyword : "" %>">
+
+            <button type="submit"
+                    class="search-button">
+                Search
+            </button>
+
+            <%
+                if (keyword != null &&
+                    !keyword.trim().isEmpty()) {
+            %>
+
+                <a href="resources"
+                   class="clear-button">
+                    Clear
+                </a>
+
+            <%
+                }
+            %>
+
+        </form>
+
+    </div>
+
+
+    <!-- RESOURCE LIST -->
+
+    <%
+        if (resources != null && !resources.isEmpty()) {
+    %>
+
+        <div class="resource-grid">
+
+            <%
                 for (Resource resource : resources) {
 
-        %>
+                    String status =
+                        resource.getStatus() != null
+                        ? resource.getStatus().toUpperCase()
+                        : "";
 
-            <div class="resource-card">
+                    String statusClass =
+                        status.toLowerCase();
+            %>
 
-                <div class="resource-header">
+                <!-- RESOURCE CARD -->
 
-                    <div class="resource-icon">
-                        ▦
-                    </div>
+                <div class="resource-card">
 
-                    <div class="resource-title">
+                    <h3>
+                        <%= resource.getResourceName() %>
+                    </h3>
 
-                        <h2>
-                            <%= resource.getResourceName() %>
-                        </h2>
+                    <p>
+                        <strong>Type:</strong>
+                        <%= resource.getResourceType() != null
+                            ? resource.getResourceType()
+                            : "Not specified" %>
+                    </p>
 
-                        <div class="resource-subtitle">
-                            Shared Event Resource
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="resource-info">
-
-                    <strong>Type:</strong>
-
-                    <span>
-                        <%= resource.getResourceType() %>
-                    </span>
-
-                </div>
-
-
-                <div class="resource-info">
-
-                    <strong>Quantity:</strong>
-
-                    <span>
+                    <p>
+                        <strong>Quantity:</strong>
                         <%= resource.getQuantity() %>
-                    </span>
+                    </p>
+
+                    <p>
+                        <strong>Status:</strong>
+
+                        <span class="status <%= statusClass %>">
+                            <%= status %>
+                        </span>
+
+                    </p>
+
+
+                    <!-- EDIT / DELETE -->
+
+                    <div class="actions">
+
+                        <a href="resources?action=edit&id=<%= resource.getResourceId() %>"
+                           class="edit-button">
+                            Edit
+                        </a>
+
+                        <a href="resources?action=delete&id=<%= resource.getResourceId() %>"
+                           class="delete-button"
+                           onclick="return confirm('Are you sure you want to delete this resource?');">
+                            Delete
+                        </a>
+
+                    </div>
 
                 </div>
 
-
-                <div class="resource-info">
-
-                    <strong>Status:</strong>
-
-                    <span class="<%= resource.getStatus()
-                        .toLowerCase() %>">
-
-                        <%= resource.getStatus() %>
-
-                    </span>
-
-                </div>
-
-            </div>
-
-        <%
-
+            <%
                 }
-
-            } else {
-
-        %>
-
-            <div class="empty-state">
-
-                <div class="empty-icon">
-                    ▦
-                </div>
-
-                <h2>
-                    No resources found
-                </h2>
-
-                <p>
-                    There are currently no resources matching your search.
-                </p>
-
-            </div>
-
-        <%
-
-            }
-
-        %>
+            %>
 
         </div>
 
-    </div>
+    <%
+        } else {
+    %>
+
+        <!-- NO RESOURCES -->
+
+        <div class="empty-message">
+
+            <h3>
+                No resources found
+            </h3>
+
+            <p>
+                There are currently no resources available.
+            </p>
+
+            <a href="resources?action=add"
+               class="add-button">
+                + Add Resource
+            </a>
+
+        </div>
+
+    <%
+        }
+    %>
+
+</div>
 
 
-    <!-- =========================
-         FOOTER
-    ========================= -->
+<!-- FOOTER -->
 
-    <div class="footer">
-        EventSync &nbsp;•&nbsp; Event Room & Resource Scheduler
-    </div>
+<footer>
+
+    EventSync &copy; 2026 |
+    Event Room & Resource Scheduler
+
+</footer>
+```
 
 </body>
 
