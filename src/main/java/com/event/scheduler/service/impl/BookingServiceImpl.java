@@ -8,18 +8,18 @@ import java.util.List;
 
 import com.event.scheduler.dao.BookingDAO;
 import com.event.scheduler.dao.BookingResourceDAO;
+import com.event.scheduler.dao.NotificationDAO;
 import com.event.scheduler.dao.RoomDAO;
 import com.event.scheduler.dao.impl.BookingDAOImpl;
 import com.event.scheduler.dao.impl.BookingResourceDAOImpl;
+import com.event.scheduler.dao.impl.NotificationDAOImpl;
 import com.event.scheduler.dao.impl.RoomDAOImpl;
 import com.event.scheduler.model.Booking;
 import com.event.scheduler.model.BookingResource;
+import com.event.scheduler.model.Notification;
 import com.event.scheduler.model.Room;
 import com.event.scheduler.service.BookingService;
 import com.event.scheduler.util.DBConnection;
-import com.event.scheduler.dao.NotificationDAO;
-import com.event.scheduler.dao.impl.NotificationDAOImpl;
-import com.event.scheduler.model.Notification;
 
 public class BookingServiceImpl
         implements BookingService {

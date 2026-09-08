@@ -19,15 +19,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public boolean addNotification(Notification notification) {
 
-        if (notification == null) {
-            return false;
-        }
-
-        if (notification.getUserId() <= 0) {
-            return false;
-        }
-
-        if (notification.getMessage() == null
+        if ((notification == null) || (notification.getUserId() <= 0) || notification.getMessage() == null
                 || notification.getMessage().trim().isEmpty()) {
             return false;
         }
