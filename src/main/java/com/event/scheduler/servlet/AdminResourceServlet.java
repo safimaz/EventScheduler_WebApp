@@ -67,56 +67,147 @@ public class AdminResourceServlet extends HttpServlet {
             return;
         }
 
-
         try {
 
-            String resourceName =
-                    request.getParameter("resourceName");
-
-            String resourceType =
-                    request.getParameter("resourceType");
-
-            int quantity =
-                    Integer.parseInt(
-                            request.getParameter("quantity"));
-
-            String status =
-                    request.getParameter("status");
+            String action =
+                    request.getParameter("action");
 
 
-            Resource resource =
-                    new Resource();
+            /*
+             * ==========================
+             * UPDATE RESOURCE
+             * ==========================
+             */
+
+            if ("update".equalsIgnoreCase(action)) {
+
+                int resourceId =
+                        Integer.parseInt(
+                                request.getParameter("resourceId"));
+
+                String resourceName =
+                        request.getParameter("resourceName");
+
+                String resourceType =
+                        request.getParameter("resourceType");
+
+                int quantity =
+                        Integer.parseInt(
+                                request.getParameter("quantity"));
+
+                String status =
+                        request.getParameter("status");
 
 
-            resource.setResourceName(
-                    resourceName);
-
-            resource.setResourceType(
-                    resourceType);
-
-            resource.setQuantity(
-                    quantity);
-
-            resource.setStatus(
-                    status);
+                Resource resource =
+                        resourceService.getResourceById(
+                                resourceId);
 
 
-            boolean added =
-                    resourceService.addResource(
-                            resource);
+                if (resource == null) {
+
+                    request.getSession().setAttribute(
+                            "resourceErrorMessage",
+                            "Resource not found.");
+
+                } else {
+
+                    /*
+                     * Keep the same resource ID.
+                     * Update the resource details.
+                     */
+
+                    resource.setResourceName(
+                            resourceName);
+
+                    resource.setResourceType(
+                            resourceType);
+
+                    resource.setQuantity(
+                            quantity);
+
+                    resource.setStatus(
+                            status);
 
 
-            if (added) {
+                    boolean updated =
+                            resourceService.updateResource(
+                                    resource);
 
-                request.getSession().setAttribute(
-                        "resourceSuccessMessage",
-                        "Resource added successfully.");
 
-            } else {
+                    if (updated) {
 
-                request.getSession().setAttribute(
-                        "resourceErrorMessage",
-                        "Unable to add resource.");
+                        request.getSession().setAttribute(
+                                "resourceSuccessMessage",
+                                "Resource updated successfully.");
+
+                    } else {
+
+                        request.getSession().setAttribute(
+                                "resourceErrorMessage",
+                                "Unable to update resource.");
+                    }
+                }
+
+            }
+
+
+            /*
+             * ==========================
+             * ADD RESOURCE
+             * ==========================
+             */
+
+            else {
+
+                String resourceName =
+                        request.getParameter("resourceName");
+
+                String resourceType =
+                        request.getParameter("resourceType");
+
+                int quantity =
+                        Integer.parseInt(
+                                request.getParameter("quantity"));
+
+                String status =
+                        request.getParameter("status");
+
+
+                Resource resource =
+                        new Resource();
+
+
+                resource.setResourceName(
+                        resourceName);
+
+                resource.setResourceType(
+                        resourceType);
+
+                resource.setQuantity(
+                        quantity);
+
+                resource.setStatus(
+                        status);
+
+
+                boolean added =
+                        resourceService.addResource(
+                                resource);
+
+
+                if (added) {
+
+                    request.getSession().setAttribute(
+                            "resourceSuccessMessage",
+                            "Resource added successfully.");
+
+                } else {
+
+                    request.getSession().setAttribute(
+                            "resourceErrorMessage",
+                            "Unable to add resource.");
+                }
             }
 
 
@@ -124,8 +215,7 @@ public class AdminResourceServlet extends HttpServlet {
 
             request.getSession().setAttribute(
                     "resourceErrorMessage",
-                    "Quantity must be a valid number.");
-
+                    "Resource ID and quantity must be valid numbers.");
 
         } catch (Exception e) {
 
@@ -133,7 +223,7 @@ public class AdminResourceServlet extends HttpServlet {
 
             request.getSession().setAttribute(
                     "resourceErrorMessage",
-                    "An unexpected error occurred while adding the resource.");
+                    "An unexpected error occurred while processing the resource.");
         }
 
 
@@ -141,7 +231,6 @@ public class AdminResourceServlet extends HttpServlet {
                 request.getContextPath()
                 + "/admin/resources");
     }
-
 
     private boolean isAdmin(
             HttpServletRequest request,
