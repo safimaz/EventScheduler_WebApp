@@ -202,7 +202,7 @@
             <h2>Room Management</h2>
 
             <!-- We will implement this in the next step -->
-            <a href="#"
+            <a href="<%= request.getContextPath() %>/add-room.jsp"
                class="add-btn">
                 + Add Room
             </a>
