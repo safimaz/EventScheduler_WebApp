@@ -51,22 +51,26 @@ public class AdminRoomServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(
-            HttpServletRequest request,
-            HttpServletResponse response)
+    protected void doPost(HttpServletRequest request,
+                          HttpServletResponse response)
             throws ServletException, IOException {
 
         if (!isAdmin(request, response)) {
             return;
         }
+
         try {
 
             String action =
                     request.getParameter("action");
 
-            // =========================
-            // UPDATE ROOM
-            // =========================
+
+            /*
+             * ==========================
+             * UPDATE ROOM
+             * ==========================
+             */
+
             if ("update".equalsIgnoreCase(action)) {
 
                 int roomId =
@@ -89,18 +93,25 @@ public class AdminRoomServlet extends HttpServlet {
                 String status =
                         request.getParameter("status");
 
-                Room room =
-                        new Room();
+
+                Room room = new Room();
 
                 room.setRoomId(roomId);
+
                 room.setRoomName(roomName);
+
                 room.setCapacity(capacity);
+
                 room.setLocation(location);
+
                 room.setDescription(description);
+
                 room.setStatus(status);
+
 
                 boolean updated =
                         roomService.updateRoom(room);
+
 
                 if (updated) {
 
@@ -113,14 +124,75 @@ public class AdminRoomServlet extends HttpServlet {
                     request.getSession().setAttribute(
                             "roomErrorMessage",
                             "Unable to update room.");
-
                 }
 
             }
 
-            // =========================
-            // ADD ROOM
-            // =========================
+
+            /*
+             * ==========================
+             * DEACTIVATE ROOM
+             * ==========================
+             */
+
+            else if ("deactivate".equalsIgnoreCase(action)) {
+
+                int roomId =
+                        Integer.parseInt(
+                                request.getParameter("roomId"));
+
+
+                // Get the existing room using its ID
+
+                Room room =
+                        roomService.getRoomById(roomId);
+
+
+                if (room == null) {
+
+                    request.getSession().setAttribute(
+                            "roomErrorMessage",
+                            "Room not found.");
+
+                } else {
+
+                    /*
+                     * Keep the existing room ID
+                     * and all other room details.
+                     *
+                     * Only change the status.
+                     */
+
+                    room.setStatus("INACTIVE");
+
+
+                    boolean deactivated =
+                            roomService.updateRoom(room);
+
+
+                    if (deactivated) {
+
+                        request.getSession().setAttribute(
+                                "roomSuccessMessage",
+                                "Room deactivated successfully.");
+
+                    } else {
+
+                        request.getSession().setAttribute(
+                                "roomErrorMessage",
+                                "Unable to deactivate room.");
+                    }
+                }
+
+            }
+
+
+            /*
+             * ==========================
+             * ADD ROOM
+             * ==========================
+             */
+
             else {
 
                 String roomName =
@@ -139,17 +211,23 @@ public class AdminRoomServlet extends HttpServlet {
                 String status =
                         request.getParameter("status");
 
-                Room room =
-                        new Room();
+
+                Room room = new Room();
 
                 room.setRoomName(roomName);
+
                 room.setCapacity(capacity);
+
                 room.setLocation(location);
+
                 room.setDescription(description);
+
                 room.setStatus(status);
+
 
                 boolean added =
                         roomService.addRoom(room);
+
 
                 if (added) {
 
@@ -162,9 +240,9 @@ public class AdminRoomServlet extends HttpServlet {
                     request.getSession().setAttribute(
                             "roomErrorMessage",
                             "Unable to add room.");
-
                 }
             }
+
 
         } catch (NumberFormatException e) {
 
@@ -178,15 +256,14 @@ public class AdminRoomServlet extends HttpServlet {
 
             request.getSession().setAttribute(
                     "roomErrorMessage",
-                    "An unexpected error occurred "
-                    + "while processing the room.");
+                    "An unexpected error occurred while processing the room.");
         }
+
 
         response.sendRedirect(
                 request.getContextPath()
                 + "/admin/rooms");
     }
-
     private boolean isAdmin(
             HttpServletRequest request,
             HttpServletResponse response)
