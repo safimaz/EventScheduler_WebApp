@@ -49,11 +49,13 @@
             color: #333;
         }
 
+
         /* Header */
 
         .header {
             background: #1f2937;
             color: white;
+
             padding: 20px 40px;
 
             display: flex;
@@ -68,13 +70,16 @@
 
         .back-btn {
             text-decoration: none;
+
             color: white;
+
             background: #374151;
 
             padding: 10px 18px;
 
             border-radius: 6px;
         }
+
 
         /* Container */
 
@@ -85,6 +90,7 @@
 
             padding: 0 20px;
         }
+
 
         /* Page Header */
 
@@ -118,6 +124,11 @@
             font-weight: bold;
         }
 
+        .add-btn:hover {
+            background: #1d4ed8;
+        }
+
+
         /* Messages */
 
         .success-message {
@@ -144,6 +155,7 @@
             margin-bottom: 20px;
         }
 
+
         /* Resource Grid */
 
         .resources-grid {
@@ -154,6 +166,7 @@
 
             gap: 20px;
         }
+
 
         /* Resource Card */
 
@@ -166,6 +179,10 @@
 
             box-shadow:
                 0 2px 8px rgba(0, 0, 0, 0.08);
+
+            display: flex;
+
+            flex-direction: column;
         }
 
         .resource-card h3 {
@@ -182,10 +199,13 @@
             color: #555;
         }
 
+
         /* Status */
 
         .status {
             display: inline-block;
+
+            align-self: flex-start;
 
             margin-top: 12px;
 
@@ -216,6 +236,38 @@
             color: #991b1b;
         }
 
+
+        /* Resource Actions */
+
+        .resource-actions {
+            margin-top: 20px;
+
+            display: flex;
+
+            gap: 10px;
+
+            flex-wrap: wrap;
+        }
+
+        .edit-btn {
+            text-decoration: none;
+
+            background: #2563eb;
+
+            color: white;
+
+            padding: 9px 16px;
+
+            border-radius: 6px;
+
+            font-weight: bold;
+        }
+
+        .edit-btn:hover {
+            background: #1d4ed8;
+        }
+
+
         /* Empty */
 
         .empty {
@@ -229,6 +281,7 @@
 
             color: #666;
         }
+
 
         /* Mobile */
 
@@ -260,7 +313,10 @@
 
     <div class="header">
 
-        <h1>EventSync Admin</h1>
+        <h1>
+            EventSync Admin
+        </h1>
+
 
         <a
             href="<%= request.getContextPath() %>/dashboard.jsp"
@@ -286,7 +342,6 @@
                 Resource Management
             </h2>
 
-            <!-- Add Resource will be implemented later -->
 
             <a
                 href="<%= request.getContextPath() %>/add-resource.jsp"
@@ -307,6 +362,7 @@
                     (String) session.getAttribute(
                             "resourceSuccessMessage");
 
+
             String resourceErrorMessage =
                     (String) session.getAttribute(
                             "resourceErrorMessage");
@@ -314,6 +370,7 @@
 
             session.removeAttribute(
                     "resourceSuccessMessage");
+
 
             session.removeAttribute(
                     "resourceErrorMessage");
@@ -453,6 +510,25 @@
                             class="status <%= statusClass %>">
 
                             <%= status %>
+
+                        </div>
+
+
+                        <!-- Resource Actions -->
+
+                        <div class="resource-actions">
+
+
+                            <!-- Edit Resource -->
+
+                            <a
+                                href="<%= request.getContextPath() %>/edit-resource.jsp?resourceId=<%= resource.getResourceId() %>"
+                                class="edit-btn">
+
+                                Edit Resource
+
+                            </a>
+
 
                         </div>
 
