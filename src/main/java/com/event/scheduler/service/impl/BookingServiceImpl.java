@@ -561,6 +561,16 @@ public class BookingServiceImpl
 
             bookingDAO.markBookingAsExpired(
                     booking.getBookingId());
+
+            // Create notification for the booking owner
+            Notification notification = new Notification(
+                    booking.getUserId(),
+                    "Your booking has expired because the scheduled booking time has passed.",
+                    "BOOKING_EXPIRED",
+                    "N"
+            );
+
+            notificationDAO.addNotification(notification);
         }
     }
 
