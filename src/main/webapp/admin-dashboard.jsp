@@ -544,7 +544,7 @@
                     availability.
                 </p>
 
-                <a href="#">
+                <a href="<%= request.getContextPath() %>/admin/rooms">
 
                     Manage Rooms
 
