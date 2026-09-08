@@ -5,7 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.event.scheduler.dao.NotificationDAO;
+import com.event.scheduler.dao.impl.NotificationDAOImpl;
 import com.event.scheduler.model.Booking;
+import com.event.scheduler.model.Notification;
 import com.event.scheduler.model.Room;
 import com.event.scheduler.model.User;
 import com.event.scheduler.service.BookingService;
@@ -27,12 +30,14 @@ public class MyBookingsServlet extends HttpServlet {
 
     private BookingService bookingService;
     private RoomService roomService;
+    private NotificationDAO notificationDAO;
 
     @Override
     public void init() throws ServletException {
 
         bookingService = new BookingServiceImpl();
         roomService = new RoomServiceImpl();
+        notificationDAO = new NotificationDAOImpl();
     }
 
     @Override
@@ -96,7 +101,6 @@ public class MyBookingsServlet extends HttpServlet {
                 "my-bookings.jsp")
                .forward(request, response);
     }
-
 
     @Override
     protected void doPost(
@@ -167,6 +171,21 @@ public class MyBookingsServlet extends HttpServlet {
 
             if (cancelled) {
 
+                // ------------------------------------
+                // Create cancellation notification
+                // ------------------------------------
+
+                Notification notification =
+                        new Notification(
+                                loggedInUser.getUserId(),
+                                "Your booking has been cancelled.",
+                                "BOOKING_CANCELLED",
+                                "N"
+                        );
+
+                notificationDAO.addNotification(
+                        notification);
+
                 session.setAttribute(
                         "successMessage",
                         "Booking #"
@@ -202,10 +221,4 @@ public class MyBookingsServlet extends HttpServlet {
 
         response.sendRedirect("my-bookings");
     }
-
-
-
-
-
-
 }
