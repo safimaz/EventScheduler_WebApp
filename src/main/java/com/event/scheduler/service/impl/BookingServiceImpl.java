@@ -17,6 +17,9 @@ import com.event.scheduler.model.BookingResource;
 import com.event.scheduler.model.Room;
 import com.event.scheduler.service.BookingService;
 import com.event.scheduler.util.DBConnection;
+import com.event.scheduler.dao.NotificationDAO;
+import com.event.scheduler.dao.impl.NotificationDAOImpl;
+import com.event.scheduler.model.Notification;
 
 public class BookingServiceImpl
         implements BookingService {
@@ -24,6 +27,7 @@ public class BookingServiceImpl
 	private final BookingDAO bookingDAO;
 	private final RoomDAO roomDAO;
 	private final BookingResourceDAO bookingResourceDAO;
+	private final NotificationDAO notificationDAO;
 
 	public BookingServiceImpl() {
 
@@ -31,6 +35,9 @@ public class BookingServiceImpl
 	    this.roomDAO = new RoomDAOImpl();
 	    this.bookingResourceDAO =
 	            new BookingResourceDAOImpl();
+
+	    this.notificationDAO =
+	            new NotificationDAOImpl();
 	}
 
     @Override
@@ -339,7 +346,20 @@ public class BookingServiceImpl
 
                 connection.commit();
 
-                return true;
+             // ---------------------------------
+             // 13. Create notification
+             // ---------------------------------
+
+             Notification notification = new Notification(
+                     booking.getUserId(),
+                     "Your booking request has been submitted for approval.",
+                     "BOOKING_CREATED",
+                     "N"
+             );
+
+             notificationDAO.addNotification(notification);
+
+             return true;
 
             } catch (Exception e) {
 
