@@ -303,8 +303,8 @@
         <h1>EventSync - Resource Management</h1>
 
         <a
-            href="<%= request.getContextPath() %>/admin/dashboard"
-            class="back-btn">
+            href="<%= request.getContextPath() %>/admin"
+    class="back-btn">
 
             Back to Admin Dashboard
 
