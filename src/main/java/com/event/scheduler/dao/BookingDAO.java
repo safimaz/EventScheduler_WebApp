@@ -51,7 +51,7 @@ public interface BookingDAO {
 
 //  Change PENDING->EXPIRED
     boolean markBookingAsExpired(int bookingId);
-    
+
 //  Retrieve bookings based on specific date
     List<Booking> getBookingsByDate(LocalDate date);
 }

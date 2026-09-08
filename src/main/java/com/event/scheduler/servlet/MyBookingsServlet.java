@@ -103,78 +103,78 @@ public class MyBookingsServlet extends HttpServlet {
             HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
-     
+
         HttpSession session =
                 request.getSession(false);
-     
+
         // Check login
         if (session == null ||
                 session.getAttribute("loggedInUser") == null) {
-     
+
             response.sendRedirect("login.jsp");
             return;
         }
-     
+
         try {
-     
+
             User loggedInUser =
                     (User) session.getAttribute(
                             "loggedInUser");
-     
+
             int bookingId =
                     Integer.parseInt(
                             request.getParameter(
                                     "bookingId"));
-     
+
             // Get the booking
             Booking booking =
                     bookingService.getBookingById(
                             bookingId);
-     
+
             // Check whether booking exists
             if (booking == null) {
-     
+
                 session.setAttribute(
                         "errorMessage",
                         "Booking not found.");
-     
+
                 response.sendRedirect(
                         "my-bookings");
-     
+
                 return;
             }
-     
+
             // Make sure the booking belongs
             // to the logged-in user
             if (booking.getUserId()
                     != loggedInUser.getUserId()) {
-     
+
                 session.setAttribute(
                         "errorMessage",
                         "You are not authorized to cancel "
                         + "this booking.");
-     
+
                 response.sendRedirect(
                         "my-bookings");
-     
+
                 return;
             }
-     
+
             // Cancel booking
             boolean cancelled =
                     bookingService.cancelBooking(
                             bookingId);
-     
+
             if (cancelled) {
-     
+
                 session.setAttribute(
                         "successMessage",
                         "Booking #"
                         + bookingId
                         + " cancelled successfully.");
-     
+
             } else {
-     
+
                 session.setAttribute(
                         "errorMessage",
                         "Unable to cancel Booking #"
@@ -183,23 +183,23 @@ public class MyBookingsServlet extends HttpServlet {
                         + "Only PENDING or CONFIRMED "
                         + "bookings can be cancelled.");
             }
-     
+
         } catch (NumberFormatException e) {
-     
+
             session.setAttribute(
                     "errorMessage",
                     "Invalid booking ID.");
-     
+
         } catch (Exception e) {
-     
+
             e.printStackTrace();
-     
+
             session.setAttribute(
                     "errorMessage",
                     "An unexpected error occurred "
                     + "while cancelling the booking.");
         }
-     
+
         response.sendRedirect("my-bookings");
     }
 

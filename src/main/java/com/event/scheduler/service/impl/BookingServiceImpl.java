@@ -45,18 +45,8 @@ public class BookingServiceImpl
         }
 
         if (booking.getStartTime() == null ||
-                booking.getEndTime() == null) {
-
-            return false;
-        }
-
-        if (!booking.getEndTime()
-                .isAfter(booking.getStartTime())) {
-
-            return false;
-        }
-
-        if (booking.getAttendeeCount() <= 0) {
+                booking.getEndTime() == null || !booking.getEndTime()
+                .isAfter(booking.getStartTime()) || (booking.getAttendeeCount() <= 0)) {
             return false;
         }
 
@@ -186,18 +176,8 @@ public class BookingServiceImpl
         }
 
         if (booking.getStartTime() == null ||
-                booking.getEndTime() == null) {
-
-            return false;
-        }
-
-        if (!booking.getEndTime()
-                .isAfter(booking.getStartTime())) {
-
-            return false;
-        }
-
-        if (booking.getAttendeeCount() <= 0) {
+                booking.getEndTime() == null || !booking.getEndTime()
+                .isAfter(booking.getStartTime()) || (booking.getAttendeeCount() <= 0)) {
             return false;
         }
 
@@ -573,6 +553,6 @@ public class BookingServiceImpl
 
         return bookingDAO.getBookingsByDate(date);
     }
-    
+
 
 }

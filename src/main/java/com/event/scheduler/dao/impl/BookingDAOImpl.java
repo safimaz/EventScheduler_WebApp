@@ -1,10 +1,9 @@
 package com.event.scheduler.dao.impl;
-import java.time.LocalDate;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -487,13 +486,13 @@ public class BookingDAOImpl implements BookingDAO {
 
         return booking;
     }
-    
+
     @Override
 
     public List<Booking> getBookingsByDate(LocalDate date) {
-     
+
         List<Booking> bookings = new ArrayList<>();
-     
+
         String sql =
 
                 "SELECT booking_id, room_id, user_id, "
@@ -511,23 +510,23 @@ public class BookingDAOImpl implements BookingDAO {
                 + "AND end_time > ? "
 
                 + "ORDER BY room_id, start_time";
-     
+
         LocalDateTime startOfDay =
 
                 date.atStartOfDay();
-     
+
         LocalDateTime startOfNextDay =
 
                 date.plusDays(1).atStartOfDay();
-     
+
         try (Connection connection =
 
                 DBConnection.getConnection();
-     
+
              PreparedStatement statement =
 
                 connection.prepareStatement(sql)) {
-     
+
             statement.setTimestamp(
 
                     1,
@@ -535,7 +534,7 @@ public class BookingDAOImpl implements BookingDAO {
                     Timestamp.valueOf(startOfNextDay)
 
             );
-     
+
             statement.setTimestamp(
 
                     2,
@@ -543,13 +542,13 @@ public class BookingDAOImpl implements BookingDAO {
                     Timestamp.valueOf(startOfDay)
 
             );
-     
+
             try (ResultSet resultSet =
 
                     statement.executeQuery()) {
-     
+
                 while (resultSet.next()) {
-     
+
                     bookings.add(
 
                             mapBooking(resultSet)
@@ -559,19 +558,19 @@ public class BookingDAOImpl implements BookingDAO {
                 }
 
             }
-     
+
         } catch (Exception e) {
-     
+
             e.printStackTrace();
 
         }
-     
+
         return bookings;
 
     }
-     
-    
-    
-    
-    
+
+
+
+
+
 }
