@@ -44,6 +44,7 @@
 <body>
 
     <h1>User Management</h1>
+    <a href="create-user.jsp">Add New User</a>
 
     <%
         List<User> users =
