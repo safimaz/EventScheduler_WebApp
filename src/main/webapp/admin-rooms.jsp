@@ -321,6 +321,27 @@
                             people
 
                         </div>
+                        <div style="
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;">
+
+    <a
+        href="<%= request.getContextPath() %>/edit-room.jsp?roomId=<%= room.getRoomId() %>"
+        style="
+            text-decoration: none;
+            background: #2563eb;
+            color: white;
+            padding: 9px 16px;
+            border-radius: 6px;
+            font-weight: bold;">
+
+        Edit Room
+
+    </a>
+
+</div>
+                        
 
 
                         <div class="room-info">
