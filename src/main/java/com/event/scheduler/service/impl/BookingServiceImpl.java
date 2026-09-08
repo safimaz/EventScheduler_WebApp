@@ -58,13 +58,13 @@ public class BookingServiceImpl
                 roomDAO.getRoomById(
                         booking.getRoomId());
 
-        
+
 
         // -----------------------------------------
         // 3. Check room status
         // -----------------------------------------
 
-        
+
 
         // -----------------------------------------
         // 4. Check room capacity
@@ -184,19 +184,19 @@ public class BookingServiceImpl
                 roomDAO.getRoomById(
                         booking.getRoomId());
 
-        
+
 
         // -----------------------------------------
         // 3. Check room status
         // -----------------------------------------
 
-        
+
 
         // -----------------------------------------
         // 4. Check room capacity
         // -----------------------------------------
 
-        
+
 
         // -----------------------------------------
         // 5. Check room availability
@@ -221,18 +221,9 @@ public class BookingServiceImpl
             for (BookingResource bookingResource
                     : bookingResources) {
 
-                if (bookingResource == null) {
-                    return false;
-                }
-
-                if (bookingResource.getResourceId()
-                        <= 0) {
-
-                    return false;
-                }
-
-                if (bookingResource.getQuantity()
-                        <= 0) {
+                if ((bookingResource == null) || (bookingResource.getResourceId()
+                        <= 0) || (bookingResource.getQuantity()
+                        <= 0)) {
 
                     return false;
                 }
