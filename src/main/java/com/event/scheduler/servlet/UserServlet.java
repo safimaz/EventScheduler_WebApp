@@ -58,4 +58,100 @@ public class UserServlet extends HttpServlet {
                 "users.jsp")
                 .forward(request, response);
     }
+
+    @Override
+    protected void doPost(
+            HttpServletRequest request,
+            HttpServletResponse response)
+            throws ServletException, IOException {
+
+        HttpSession session =
+                request.getSession(false);
+
+        // Check whether user is logged in
+        if (session == null ||
+                session.getAttribute("loggedInUser") == null) {
+
+            response.sendRedirect("login.jsp");
+            return;
+        }
+
+        try {
+
+            // ------------------------------------
+            // Read user information from form
+            // ------------------------------------
+
+            String name =
+                    request.getParameter("name");
+
+            String email =
+                    request.getParameter("email");
+
+            String password =
+                    request.getParameter("password");
+
+            String role =
+                    request.getParameter("role");
+
+            String status =
+                    request.getParameter("status");
+
+            // ------------------------------------
+            // Create User object
+            // ------------------------------------
+
+            User user =
+                    new User();
+
+            user.setName(name);
+            user.setEmail(email);
+            user.setPassword(password);
+            user.setRole(role);
+            user.setStatus(status);
+
+            // ------------------------------------
+            // Add user
+            // ------------------------------------
+
+            boolean created =
+                    userService.addUser(user);
+
+            // ------------------------------------
+            // User created successfully
+            // ------------------------------------
+
+            if (created) {
+
+                session.setAttribute(
+                        "successMessage",
+                        "User created successfully.");
+
+                response.sendRedirect("users");
+
+                return;
+            }
+
+            // ------------------------------------
+            // User creation failed
+            // ------------------------------------
+
+            request.setAttribute(
+                    "errorMessage",
+                    "Unable to create user.");
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            request.setAttribute(
+                    "errorMessage",
+                    "Invalid user information.");
+        }
+
+        // Return to create user form
+        request.getRequestDispatcher(
+                "create-user.jsp")
+                .forward(request, response);
+    }
 }
