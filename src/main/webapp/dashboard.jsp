@@ -1,12 +1,14 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
+<%@ page language="java"
+    contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 
 <%@ page import="com.event.scheduler.model.User" %>
+<%@ page import="jakarta.servlet.http.HttpServletResponse" %>
 
 <%
 
     User loggedInUser =
-        (User) session.getAttribute("loggedInUser");
+            (User) session.getAttribute("loggedInUser");
 
     if (loggedInUser == null) {
 
@@ -16,668 +18,372 @@
 
     }
 
+    if (!"ADMIN".equalsIgnoreCase(
+            loggedInUser.getRole())) {
+
+        response.sendError(
+                HttpServletResponse.SC_FORBIDDEN,
+                "Access Denied");
+
+        return;
+
+    }
+
 %>
 
 <!DOCTYPE html>
 
-<html lang="en">
+<html>
 
 <head>
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Dashboard - EventSync</title>
-
+    <title>Admin Dashboard - EventSync</title>
 
     <style>
 
-        /* =========================================
-           GLOBAL
-        ========================================= */
-
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
         }
 
         body {
-
-            font-family: "Segoe UI", Arial, sans-serif;
-
+            font-family: Arial, Helvetica, sans-serif;
             background: #f8fafc;
-
-            color: #1e293b;
-
+            color: #0f172a;
             min-height: 100vh;
         }
 
-        a {
-            text-decoration: none;
-        }
-
-
-        /* =========================================
+        /* =========================
            NAVBAR
-        ========================================= */
+        ========================= */
 
-        .navbar {
-
+        .header {
             height: 72px;
-
             background: #ffffff;
-
             border-bottom: 1px solid #e2e8f0;
-
+            padding: 0 42px;
             display: flex;
-
-            align-items: center;
-
             justify-content: space-between;
-
-            padding: 0 5%;
-
-            position: sticky;
-
-            top: 0;
-
-            z-index: 1000;
-        }
-
-
-        /* =========================================
-           LOGO
-        ========================================= */
-
-        .logo {
-
-            display: flex;
-
             align-items: center;
-
-            gap: 10px;
-
-            font-size: 22px;
-
-            font-weight: 700;
-
-            color: #0f172a;
         }
 
-        .logo-icon {
-
-            width: 38px;
-
-            height: 38px;
-
+        .brand {
             display: flex;
-
             align-items: center;
-
-            justify-content: center;
-
-            border-radius: 9px;
-
-            background: #2563eb;
-
-            color: white;
-
-            font-size: 15px;
-
-            font-weight: 700;
+            gap: 12px;
         }
 
-        .logo span {
-
-            color: #2563eb;
-        }
-
-
-        /* =========================================
-           USER INFORMATION
-        ========================================= */
-
-        .user-section {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 14px;
-        }
-
-        .user-avatar {
-
+        .brand-logo {
             width: 40px;
-
             height: 40px;
-
-            border-radius: 50%;
-
+            background: #2563eb;
+            color: #ffffff;
+            border-radius: 9px;
             display: flex;
-
             align-items: center;
-
             justify-content: center;
-
-            background: #eff6ff;
-
-            color: #2563eb;
-
+            font-size: 16px;
             font-weight: 700;
-
-            font-size: 15px;
-
-            border: 1px solid #dbeafe;
         }
 
-        .user-info {
-
-            text-align: right;
-        }
-
-        .user-info .user-name {
-
-            display: block;
-
+        .brand-name {
+            font-size: 20px;
+            font-weight: 700;
             color: #0f172a;
+            letter-spacing: -0.3px;
+        }
 
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
+        .admin-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 14px;
+            font-weight: 700;
+        }
 
+        .admin-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .admin-name {
+            color: #0f172a;
+            font-size: 14px;
             font-weight: 600;
-
-            margin-bottom: 2px;
         }
 
-        .user-info .user-role {
-
-            display: block;
-
+        .admin-role {
             color: #64748b;
-
             font-size: 12px;
+            margin-top: 2px;
         }
 
-
-        /* =========================================
+        /* =========================
            MAIN CONTAINER
-        ========================================= */
+        ========================= */
 
         .container {
-
-            width: 90%;
-
-            max-width: 1200px;
-
-            margin: auto;
-
-            padding: 45px 0 60px;
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 38px 28px 60px;
         }
 
+        /* =========================
+           BACK LINK
+        ========================= */
 
-        /* =========================================
-           PAGE HEADER
-        ========================================= */
-
-        .welcome-section {
-
-            display: flex;
-
-            align-items: flex-end;
-
-            justify-content: space-between;
-
-            margin-bottom: 35px;
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 28px;
+            transition: color 0.2s ease;
         }
 
-        .welcome-text h1 {
-
-            font-size: 32px;
-
-            line-height: 1.2;
-
-            color: #0f172a;
-
-            margin-bottom: 8px;
-
-            letter-spacing: -0.5px;
-        }
-
-        .welcome-text h1 span {
-
+        .back-link:hover {
             color: #2563eb;
         }
 
-        .welcome-text p {
+        /* =========================
+           PAGE HEADER
+        ========================= */
 
+        .page-heading {
+            margin-bottom: 30px;
+        }
+
+        .title {
+            margin: 0;
+            font-size: 30px;
+            line-height: 1.2;
+            color: #0f172a;
+            font-weight: 700;
+            letter-spacing: -0.6px;
+        }
+
+        .subtitle {
             color: #64748b;
-
-            font-size: 15px;
+            margin-top: 9px;
+            font-size: 14px;
+            line-height: 1.6;
         }
 
+        /* =========================
+           ADMIN NOTICE
+        ========================= */
 
-        /* =========================================
-           DASHBOARD STATUS
-        ========================================= */
-
-        .system-status {
-
+        .admin-banner {
             display: flex;
-
             align-items: center;
-
-            gap: 8px;
-
-            padding: 8px 13px;
-
-            border-radius: 20px;
-
-            background: #ecfdf5;
-
-            color: #059669;
-
-            border: 1px solid #d1fae5;
-
-            font-size: 12px;
-
-            font-weight: 600;
+            gap: 13px;
+            background: #eff6ff;
+            border: 1px solid #dbeafe;
+            border-radius: 9px;
+            padding: 15px 17px;
+            margin-bottom: 28px;
         }
 
-        .status-dot {
-
-            width: 7px;
-
-            height: 7px;
-
-            border-radius: 50%;
-
-            background: #10b981;
-        }
-
-
-        /* =========================================
-           SECTION TITLE
-        ========================================= */
-
-        .section-title {
-
-            margin-bottom: 18px;
-
-            color: #334155;
-
+        .admin-banner-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: #2563eb;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 16px;
-
-            font-weight: 600;
+            flex-shrink: 0;
         }
 
+        .admin-banner-text strong {
+            display: block;
+            color: #1e3a8a;
+            font-size: 13px;
+            margin-bottom: 3px;
+        }
 
-        /* =========================================
-           DASHBOARD CARDS
-        ========================================= */
+        .admin-banner-text span {
+            color: #475569;
+            font-size: 12px;
+        }
+
+        /* =========================
+           CARDS
+        ========================= */
 
         .cards {
-
             display: grid;
-
             grid-template-columns:
-                repeat(3, 1fr);
-
+                repeat(2, minmax(0, 1fr));
             gap: 20px;
         }
 
         .card {
-
             position: relative;
-
             background: #ffffff;
-
             border: 1px solid #e2e8f0;
-
-            border-radius: 10px;
-
+            border-radius: 11px;
             padding: 25px;
-
-            min-height: 220px;
-
-            display: flex;
-
-            flex-direction: column;
-
-            transition: all 0.25s ease;
+            box-shadow: 0 2px 7px rgba(15, 23, 42, 0.04);
+            transition: all 0.2s ease;
+            overflow: hidden;
         }
 
         .card:hover {
-
-            transform: translateY(-4px);
-
-            border-color: #bfdbfe;
-
-            box-shadow:
-                0 12px 30px rgba(15, 23, 42, 0.08);
+            border-color: #cbd5e1;
+            box-shadow: 0 7px 20px rgba(15, 23, 42, 0.08);
+            transform: translateY(-2px);
         }
 
-
-        /* =========================================
-           CARD ICON
-        ========================================= */
-
-        .card-icon {
-
-            width: 46px;
-
-            height: 46px;
-
+        .card-top {
             display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            background: #eff6ff;
-
-            color: #2563eb;
-
-            border-radius: 9px;
-
-            font-size: 20px;
-
+            align-items: flex-start;
+            gap: 15px;
             margin-bottom: 18px;
         }
 
-
-        /* =========================================
-           CARD CONTENT
-        ========================================= */
+        .card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 9px;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
 
         .card h3 {
-
             color: #0f172a;
-
             font-size: 17px;
-
-            margin-bottom: 8px;
-
-            font-weight: 650;
+            font-weight: 700;
+            margin-top: 2px;
         }
 
         .card p {
-
             color: #64748b;
-
             font-size: 13px;
-
             line-height: 1.6;
-
-            flex-grow: 1;
-
-            max-width: 290px;
+            min-height: 42px;
         }
 
-
-        /* =========================================
-           CARD BUTTON
-        ========================================= */
-
         .card a {
-
             display: inline-flex;
-
             align-items: center;
-
-            justify-content: center;
-
-            align-self: flex-start;
-
-            margin-top: 18px;
-
-            padding: 9px 15px;
-
-            border-radius: 6px;
-
-            background: #2563eb;
-
-            color: #ffffff;
-
+            gap: 7px;
+            margin-top: 20px;
+            padding: 9px 13px;
+            border-radius: 7px;
+            background: #f8fafc;
+            color: #2563eb;
+            text-decoration: none;
             font-size: 13px;
-
             font-weight: 600;
-
+            border: 1px solid #e2e8f0;
             transition: all 0.2s ease;
         }
 
         .card a:hover {
-
-            background: #1d4ed8;
-
-            transform: translateY(-1px);
-        }
-
-
-        /* =========================================
-           LOGOUT CARD
-        ========================================= */
-
-        .logout-card:hover {
-
-            border-color: #fecaca;
-        }
-
-        .logout {
-
-            background: #dc2626 !important;
-        }
-
-        .logout:hover {
-
-            background: #b91c1c !important;
-        }
-
-
-        /* =========================================
-           QUICK INFORMATION PANEL
-        ========================================= */
-
-        .info-panel {
-
-            margin-top: 35px;
-
-            background: #0f172a;
-
-            border-radius: 12px;
-
-            padding: 28px 30px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            gap: 30px;
-        }
-
-        .info-panel h2 {
-
+            background: #2563eb;
+            border-color: #2563eb;
             color: #ffffff;
-
-            font-size: 19px;
-
-            margin-bottom: 6px;
         }
 
-        .info-panel p {
-
-            color: #94a3b8;
-
-            font-size: 13px;
+        .arrow {
+            font-size: 15px;
+            transition: transform 0.2s ease;
         }
 
-        .info-badge {
-
-            white-space: nowrap;
-
-            padding: 10px 17px;
-
-            border-radius: 7px;
-
-            background: rgba(255, 255, 255, 0.08);
-
-            border: 1px solid rgba(255, 255, 255, 0.12);
-
-            color: #e2e8f0;
-
-            font-size: 12px;
-
-            font-weight: 600;
+        .card a:hover .arrow {
+            transform: translateX(3px);
         }
 
+        /* =========================
+           PENDING BOOKING CARD
+        ========================= */
 
-        /* =========================================
+        .pending-card {
+            border-top: 3px solid #2563eb;
+        }
+
+        .pending-card .card-icon {
+            background: #eff6ff;
+        }
+
+        /* =========================
            FOOTER
-        ========================================= */
+        ========================= */
 
         .footer {
-
-            background: #020617;
-
+            border-top: 1px solid #e2e8f0;
+            background: #ffffff;
+            padding: 20px 30px;
+            text-align: center;
             color: #94a3b8;
-
-            padding: 24px 5%;
-
-            border-top: 1px solid #0f172a;
-        }
-
-        .footer-content {
-
-            max-width: 1200px;
-
-            margin: auto;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-        }
-
-        .footer-logo {
-
-            color: #ffffff;
-
-            font-size: 14px;
-
-            font-weight: 700;
-        }
-
-        .footer-text {
-
             font-size: 12px;
         }
 
-
-        /* =========================================
+        /* =========================
            RESPONSIVE
-        ========================================= */
+        ========================= */
 
-        @media (max-width: 950px) {
+        @media (max-width: 750px) {
 
-            .cards {
-
-                grid-template-columns:
-                    repeat(2, 1fr);
-            }
-
-        }
-
-
-        @media (max-width: 700px) {
-
-            .navbar {
-
+            .header {
                 padding: 0 20px;
             }
 
-            .user-info {
-
-                display: none;
-            }
-
             .container {
-
-                width: 92%;
-
-                padding-top: 30px;
-            }
-
-            .welcome-section {
-
-                align-items: flex-start;
-
-                flex-direction: column;
-
-                gap: 18px;
-            }
-
-            .welcome-text h1 {
-
-                font-size: 27px;
+                padding: 28px 18px 45px;
             }
 
             .cards {
-
                 grid-template-columns: 1fr;
             }
 
-            .info-panel {
-
-                flex-direction: column;
-
-                align-items: flex-start;
-            }
-
-            .footer-content {
-
-                flex-direction: column;
-
-                gap: 8px;
-
-                text-align: center;
+            .admin-details {
+                display: none;
             }
 
         }
 
-
         @media (max-width: 450px) {
 
-            .logo {
-
-                font-size: 19px;
+            .brand-name {
+                font-size: 18px;
             }
 
-            .logo-icon {
-
-                width: 34px;
-
-                height: 34px;
-            }
-
-            .system-status {
-
-                font-size: 11px;
+            .title {
+                font-size: 26px;
             }
 
             .card {
+                padding: 21px;
+            }
 
-                min-height: 205px;
-
-                padding: 22px;
+            .admin-banner {
+                align-items: flex-start;
             }
 
         }
@@ -686,381 +392,250 @@
 
 </head>
 
-
 <body>
 
+    <!-- =========================
+         HEADER
+    ========================= -->
 
-    <!-- =========================================
-         NAVIGATION BAR
-    ========================================== -->
+    <div class="header">
 
-    <header class="navbar">
+        <div class="brand">
 
-
-        <!-- LOGO -->
-
-        <a href="dashboard.jsp" class="logo">
-
-            <div class="logo-icon">
+            <div class="brand-logo">
                 ES
             </div>
 
-            Event<span>Sync</span>
+            <div class="brand-name">
+                EventSync
+            </div>
+
+        </div>
+
+        <div class="admin-profile">
+
+            <div class="admin-avatar">
+                <%= loggedInUser.getName().substring(0, 1).toUpperCase() %>
+            </div>
+
+            <div class="admin-details">
+
+                <div class="admin-name">
+                    Admin: <%= loggedInUser.getName() %>
+                </div>
+
+                <div class="admin-role">
+                    Administrator
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         MAIN CONTENT
+    ========================= -->
+
+    <div class="container">
+
+        <a
+            class="back-link"
+            href="<%= request.getContextPath() %>/dashboard.jsp">
+
+            ← Back to Dashboard
 
         </a>
 
 
-        <!-- USER -->
+        <div class="page-heading">
 
-        <div class="user-section">
+            <h1 class="title">
+                Admin Dashboard
+            </h1>
 
-
-            <div class="user-info">
-
-                <span class="user-name">
-
-                    <%= loggedInUser.getName() %>
-
-                </span>
-
-                <span class="user-role">
-
-                    Role: <%= loggedInUser.getRole() %>
-
-                </span>
-
-            </div>
-
-
-            <div class="user-avatar">
-
-                <%= loggedInUser.getName().substring(0, 1).toUpperCase() %>
-
-            </div>
-
+            <p class="subtitle">
+                Manage bookings, rooms, resources and
+                system operations.
+            </p>
 
         </div>
 
 
-    </header>
+        <!-- ADMIN ACCESS BANNER -->
 
+        <div class="admin-banner">
 
+            <div class="admin-banner-icon">
+                ✓
+            </div>
 
-    <!-- =========================================
-         MAIN CONTENT
-    ========================================== -->
+            <div class="admin-banner-text">
 
-    <main>
+                <strong>
+                    Administrator Access
+                </strong>
 
-        <div class="container">
-
-
-            <!-- =====================================
-                 WELCOME
-            ====================================== -->
-
-            <div class="welcome-section">
-
-
-                <div class="welcome-text">
-
-                    <h1>
-
-                        Welcome back,
-                        <span>
-                            <%= loggedInUser.getName() %>
-                        </span>
-
-                    </h1>
-
-                    <p>
-
-                        Manage your events, rooms and resources
-                        from your centralized scheduling portal.
-
-                    </p>
-
-                </div>
-
-
-                <div class="system-status">
-
-                    <span class="status-dot"></span>
-
-                    System Operational
-
-                </div>
-
+                <span>
+                    You have access to system management and administrative operations.
+                </span>
 
             </div>
 
+        </div>
 
 
-            <!-- =====================================
-                 MANAGEMENT SECTION
-            ====================================== -->
+        <!-- MANAGEMENT CARDS -->
 
-            <div class="section-title">
-
-                Management Overview
-
-            </div>
+        <div class="cards">
 
 
-            <div class="cards">
+            <div class="card pending-card">
 
-
-                <!-- =================================
-                     ROOMS
-                ================================== -->
-
-                <div class="card">
+                <div class="card-top">
 
                     <div class="card-icon">
-                        🏢
+                        ✓
+                    </div>
+
+                    <h3>
+                        Pending Bookings
+                    </h3>
+
+                </div>
+
+                <p>
+                    Review and approve or reject
+                    pending booking requests.
+                </p>
+
+                <a
+                    href="<%= request.getContextPath() %>/admin/bookings">
+
+                    Manage Bookings
+
+                    <span class="arrow">
+                        →
+                    </span>
+
+                </a>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="card-top">
+
+                    <div class="card-icon">
+                        ▦
                     </div>
 
                     <h3>
                         Rooms
                     </h3>
 
-                    <p>
-
-                        Search and view available meeting
-                        rooms, conference halls and event spaces.
-
-                    </p>
-
-                    <a href="rooms">
-
-                        View Rooms →
-
-                    </a>
-
                 </div>
 
+                <p>
+                    Manage meeting rooms and their
+                    availability.
+                </p>
+
+                <a href="<%= request.getContextPath() %>/admin/rooms">
+
+                    Manage Rooms
+
+                    <span class="arrow">
+                        →
+                    </span>
+
+                </a>
+
+            </div>
 
 
-                <!-- =================================
-                     BOOK ROOM
-                ================================== -->
+            <div class="card">
 
-                <div class="card">
-
-                    <div class="card-icon">
-                        📅
-                    </div>
-
-                    <h3>
-                        Book a Room
-                    </h3>
-
-                    <p>
-
-                        Create a new room booking by selecting
-                        an available room, date and time.
-
-                    </p>
-
-                    <a href="book-room">
-
-                        New Booking →
-
-                    </a>
-
-                </div>
-
-
-
-                <!-- =================================
-                     MY BOOKINGS
-                ================================== -->
-
-                <div class="card">
+                <div class="card-top">
 
                     <div class="card-icon">
-                        📋
-                    </div>
-
-                    <h3>
-                        My Bookings
-                    </h3>
-
-                    <p>
-
-                        View, track and manage all your
-                        existing room and event bookings.
-
-                    </p>
-
-                    <a href="my-bookings">
-
-                        My Bookings →
-
-                    </a>
-
-                </div>
-
-
-
-                <!-- =================================
-                     RESOURCES
-                ================================== -->
-
-                <div class="card">
-
-                    <div class="card-icon">
-                        🖥
+                        ▤
                     </div>
 
                     <h3>
                         Resources
                     </h3>
 
-                    <p>
-
-                        View available shared resources and
-                        equipment required for your events.
-
-                    </p>
-
-                    <a href="resources">
-
-                        Resources →
-
-                    </a>
-
                 </div>
 
+                <p>
+                    Manage projectors, microphones,
+                    laptops and other resources.
+                </p>
+
+                <a href="#">
+
+                    Manage Resource
+
+                    <span class="arrow">
+                        →
+                    </span>
+
+                </a>
+
+            </div>
 
 
-                <!-- =================================
-                     NOTIFICATIONS
-                ================================== -->
+            <div class="card">
 
-                <div class="card">
-
-				    <div class="card-icon">
-				        📅
-				    </div>
-				
-				    <h3>
-				        Schedule
-				    </h3>
-				
-				    <p>
-				
-				        View room availability, confirmed
-				        bookings and daily room schedules.
-				
-				    </p>
-				
-				    <a href="schedule">
-				
-				        View Schedule →
-				
-				    </a>
-				
-				</div>
-
-
-
-                <!-- =================================
-                     LOGOUT
-                ================================== -->
-
-                <div class="card logout-card">
+                <div class="card-top">
 
                     <div class="card-icon">
-                        🚪
+                        ▥
                     </div>
 
                     <h3>
-                        Logout
+                        Reports
                     </h3>
 
-                    <p>
-
-                        Securely sign out of your EventSync
-                        account and end your current session.
-
-                    </p>
-
-                    <a href="logout" class="logout">
-
-                        Logout →
-
-                    </a>
-
                 </div>
 
+                <p>
+                    View room and resource utilization
+                    information.
+                </p>
 
-            </div>
+                <a href="#">
 
+                    View Reports
 
+                    <span class="arrow">
+                        →
+                    </span>
 
-            <!-- =====================================
-                 INFORMATION PANEL
-            ====================================== -->
-
-            <div class="info-panel">
-
-                <div>
-
-                    <h2>
-                        Event & Resource Scheduling
-                    </h2>
-
-                    <p>
-
-                        One centralized platform to organize
-                        your organization's rooms, resources
-                        and events.
-
-                    </p>
-
-                </div>
-
-
-                <div class="info-badge">
-
-                    EventSync Enterprise Portal
-
-                </div>
+                </a>
 
             </div>
 
 
         </div>
 
-    </main>
+    </div>
 
 
-
-    <!-- =========================================
+    <!-- =========================
          FOOTER
-    ========================================== -->
+    ========================= -->
 
-    <footer class="footer">
+    <div class="footer">
 
-        <div class="footer-content">
+        EventSync &nbsp;•&nbsp;
+        Event Room & Resource Scheduler
 
-            <div class="footer-logo">
-
-                EventSync
-
-            </div>
-
-            <div class="footer-text">
-
-                © 2026 EventSync · Event & Resource Scheduling Platform
-
-            </div>
-
-        </div>
-
-    </footer>
-
+    </div>
 
 </body>
 
