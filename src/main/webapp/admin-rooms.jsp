@@ -208,7 +208,60 @@
             </a>
 
         </div>
+       <%
+    String roomSuccessMessage =
+            (String) session.getAttribute(
+                    "roomSuccessMessage");
 
+    String roomErrorMessage =
+            (String) session.getAttribute(
+                    "roomErrorMessage");
+
+    session.removeAttribute(
+            "roomSuccessMessage");
+
+    session.removeAttribute(
+            "roomErrorMessage");
+%>
+
+<%
+    if (roomSuccessMessage != null) {
+%>
+
+    <div style="
+        background: #dcfce7;
+        color: #166534;
+        padding: 12px 16px;
+        border-radius: 6px;
+        margin-bottom: 20px;">
+        
+        <%= roomSuccessMessage %>
+
+    </div>
+
+<%
+    }
+%>
+
+
+<%
+    if (roomErrorMessage != null) {
+%>
+
+    <div style="
+        background: #fee2e2;
+        color: #991b1b;
+        padding: 12px 16px;
+        border-radius: 6px;
+        margin-bottom: 20px;">
+
+        <%= roomErrorMessage %>
+
+    </div>
+
+<%
+    }
+%>
 
         <%
             if (rooms == null || rooms.isEmpty()) {

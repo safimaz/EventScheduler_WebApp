@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.event.scheduler.model.Room;
+import com.event.scheduler.model.User;
 import com.event.scheduler.service.RoomService;
 import com.event.scheduler.service.impl.RoomServiceImpl;
 
@@ -33,37 +34,10 @@ public class AdminRoomServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session =
-                request.getSession(false);
-
-        // Check login
-        if (session == null ||
-                session.getAttribute("loggedInUser") == null) {
-
-            response.sendRedirect(
-                    request.getContextPath()
-                    + "/login.jsp");
-
+        if (!isAdmin(request, response)) {
             return;
         }
 
-        // Check admin role
-        String role =
-                ((com.event.scheduler.model.User)
-                        session.getAttribute(
-                                "loggedInUser"))
-                        .getRole();
-
-        if (!"ADMIN".equalsIgnoreCase(role)) {
-
-            response.sendRedirect(
-                    request.getContextPath()
-                    + "/dashboard.jsp");
-
-            return;
-        }
-
-        // Get all rooms
         List<Room> rooms =
                 roomService.getAllRooms();
 
@@ -71,9 +45,118 @@ public class AdminRoomServlet extends HttpServlet {
                 "rooms",
                 rooms);
 
-        // Open admin room page
         request.getRequestDispatcher(
                 "/admin-rooms.jsp")
                 .forward(request, response);
+    }
+
+    @Override
+    protected void doPost(
+            HttpServletRequest request,
+            HttpServletResponse response)
+            throws ServletException, IOException {
+
+        if (!isAdmin(request, response)) {
+            return;
+        }
+
+        try {
+
+            String roomName =
+                    request.getParameter("roomName");
+
+            int capacity =
+                    Integer.parseInt(
+                            request.getParameter("capacity"));
+
+            String location =
+                    request.getParameter("location");
+
+            String description =
+                    request.getParameter("description");
+
+            String status =
+                    request.getParameter("status");
+
+            Room room = new Room();
+
+            room.setRoomName(roomName);
+            room.setCapacity(capacity);
+            room.setLocation(location);
+            room.setDescription(description);
+            room.setStatus(status);
+
+            boolean added =
+                    roomService.addRoom(room);
+
+            if (added) {
+
+                request.getSession().setAttribute(
+                        "roomSuccessMessage",
+                        "Room added successfully.");
+
+            } else {
+
+                request.getSession().setAttribute(
+                        "roomErrorMessage",
+                        "Unable to add room.");
+
+            }
+
+        } catch (NumberFormatException e) {
+
+            request.getSession().setAttribute(
+                    "roomErrorMessage",
+                    "Capacity must be a valid number.");
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            request.getSession().setAttribute(
+                    "roomErrorMessage",
+                    "An unexpected error occurred "
+                    + "while adding the room.");
+        }
+
+        response.sendRedirect(
+                request.getContextPath()
+                + "/admin/rooms");
+    }
+
+    private boolean isAdmin(
+            HttpServletRequest request,
+            HttpServletResponse response)
+            throws IOException {
+
+        HttpSession session =
+                request.getSession(false);
+
+        if (session == null ||
+                session.getAttribute(
+                        "loggedInUser") == null) {
+
+            response.sendRedirect(
+                    request.getContextPath()
+                    + "/login.jsp");
+
+            return false;
+        }
+
+        User loggedInUser =
+                (User) session.getAttribute(
+                        "loggedInUser");
+
+        if (!"ADMIN".equalsIgnoreCase(
+                loggedInUser.getRole())) {
+
+            response.sendRedirect(
+                    request.getContextPath()
+                    + "/dashboard.jsp");
+
+            return false;
+        }
+
+        return true;
     }
 }
