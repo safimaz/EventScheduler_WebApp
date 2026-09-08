@@ -37,32 +37,109 @@ public class AdminResourceServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
-
-        // Check admin access
-
         if (!isAdmin(request, response)) {
             return;
         }
 
 
-        // Get all resources
-
         List<Resource> resources =
                 resourceService.getAllResources();
 
-
-        // Send resources to JSP
 
         request.setAttribute(
                 "resources",
                 resources);
 
 
-        // Open admin resource page
-
         request.getRequestDispatcher(
                 "/admin-resources.jsp")
                 .forward(request, response);
+    }
+
+
+    @Override
+    protected void doPost(
+            HttpServletRequest request,
+            HttpServletResponse response)
+            throws ServletException, IOException {
+
+        if (!isAdmin(request, response)) {
+            return;
+        }
+
+
+        try {
+
+            String resourceName =
+                    request.getParameter("resourceName");
+
+            String resourceType =
+                    request.getParameter("resourceType");
+
+            int quantity =
+                    Integer.parseInt(
+                            request.getParameter("quantity"));
+
+            String status =
+                    request.getParameter("status");
+
+
+            Resource resource =
+                    new Resource();
+
+
+            resource.setResourceName(
+                    resourceName);
+
+            resource.setResourceType(
+                    resourceType);
+
+            resource.setQuantity(
+                    quantity);
+
+            resource.setStatus(
+                    status);
+
+
+            boolean added =
+                    resourceService.addResource(
+                            resource);
+
+
+            if (added) {
+
+                request.getSession().setAttribute(
+                        "resourceSuccessMessage",
+                        "Resource added successfully.");
+
+            } else {
+
+                request.getSession().setAttribute(
+                        "resourceErrorMessage",
+                        "Unable to add resource.");
+            }
+
+
+        } catch (NumberFormatException e) {
+
+            request.getSession().setAttribute(
+                    "resourceErrorMessage",
+                    "Quantity must be a valid number.");
+
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            request.getSession().setAttribute(
+                    "resourceErrorMessage",
+                    "An unexpected error occurred while adding the resource.");
+        }
+
+
+        response.sendRedirect(
+                request.getContextPath()
+                + "/admin/resources");
     }
 
 
@@ -75,8 +152,6 @@ public class AdminResourceServlet extends HttpServlet {
         HttpSession session =
                 request.getSession(false);
 
-
-        // User not logged in
 
         if (session == null ||
                 session.getAttribute(
@@ -95,8 +170,6 @@ public class AdminResourceServlet extends HttpServlet {
                 (User) session.getAttribute(
                         "loggedInUser");
 
-
-        // User is not an admin
 
         if (!"ADMIN".equalsIgnoreCase(
                 loggedInUser.getRole())) {
