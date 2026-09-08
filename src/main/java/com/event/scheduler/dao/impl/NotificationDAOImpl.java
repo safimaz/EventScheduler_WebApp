@@ -127,24 +127,29 @@ public class NotificationDAOImpl implements NotificationDAO {
     }
 
     @Override
-    public boolean markAsRead(int notificationId) {
+    public boolean markAsRead(int notificationId, int userId) {
 
-        String sql = "UPDATE notifications "
-                   + "SET is_read = 'Y' "
-                   + "WHERE notification_id = ?";
+        String sql =
+            "UPDATE notifications " +
+            "SET is_read = 'Y' " +
+            "WHERE notification_id = ? " +
+            "AND user_id = ?";
 
         try (Connection connection = DBConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+             PreparedStatement preparedStatement =
+                 connection.prepareStatement(sql)) {
 
             preparedStatement.setInt(1, notificationId);
+            preparedStatement.setInt(2, userId);
 
             return preparedStatement.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            e.printStackTrace();
-        }
 
-        return false;
+            e.printStackTrace();
+
+            return false;
+        }
     }
 
     @Override

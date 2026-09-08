@@ -3,6 +3,12 @@
 
 <%@ page import="com.event.scheduler.model.User" %>
 
+<!-- ==============================
+     NOTIFICATION IMPORTS
+============================== -->
+<%@ page import="com.event.scheduler.service.NotificationService" %>
+<%@ page import="com.event.scheduler.service.impl.NotificationServiceImpl" %>
+
 <%
 
     User loggedInUser =
@@ -15,6 +21,18 @@
         return;
 
     }
+
+    // ==============================
+    // NOTIFICATION COUNT
+    // ==============================
+
+    NotificationService notificationService =
+        new NotificationServiceImpl();
+
+    int unreadNotificationCount =
+        notificationService.getUnreadNotificationCount(
+            loggedInUser.getUserId()
+        );
 
 %>
 
@@ -935,33 +953,75 @@
 
 
                 <!-- =================================
+                     SCHEDULE
+                ================================== -->
+
+                <div class="card">
+
+                    <div class="card-icon">
+                        📅
+                    </div>
+
+                    <h3>
+                        Schedule
+                    </h3>
+
+                    <p>
+
+                        View room availability, confirmed
+                        bookings and daily room schedules.
+
+                    </p>
+
+                    <a href="schedule">
+
+                        View Schedule →
+
+                    </a>
+
+                </div>
+
+
+
+                <!-- =================================
                      NOTIFICATIONS
                 ================================== -->
 
                 <div class="card">
 
-				    <div class="card-icon">
-				        📅
-				    </div>
-				
-				    <h3>
-				        Schedule
-				    </h3>
-				
-				    <p>
-				
-				        View room availability, confirmed
-				        bookings and daily room schedules.
-				
-				    </p>
-				
-				    <a href="schedule">
-				
-				        View Schedule →
-				
-				    </a>
-				
-				</div>
+                    <div class="card-icon">
+                        🔔
+                    </div>
+
+                    <h3>
+                        Notifications
+                    </h3>
+
+                    <p>
+
+                        Stay updated with your booking
+                        approvals, rejections, cancellations
+                        and other important notifications.
+
+                        <br><br>
+
+                        <strong>
+
+                            <%= unreadNotificationCount %>
+
+                            unread notification<%= unreadNotificationCount == 1 ? "" : "s" %>
+
+                        </strong>
+
+                    </p>
+
+                    <a href="notifications">
+
+                        View Notifications →
+
+                    </a>
+
+                </div>
 
 
 

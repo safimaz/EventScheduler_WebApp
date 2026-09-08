@@ -109,15 +109,17 @@ public class NotificationServlet extends HttpServlet {
             // MARK ONE NOTIFICATION AS READ
             // =========================================
 
-            if ("markRead".equalsIgnoreCase(action)) {
+            if ("markRead".equals(action)) {
 
                 int notificationId =
-                        Integer.parseInt(
-                                request.getParameter(
-                                        "notificationId"));
+                    Integer.parseInt(
+                        request.getParameter("notificationId")
+                    );
 
                 notificationService.markAsRead(
-                        notificationId);
+                    notificationId,
+                    loggedInUser.getUserId()
+                );
 
             // =========================================
             // MARK ALL NOTIFICATIONS AS READ

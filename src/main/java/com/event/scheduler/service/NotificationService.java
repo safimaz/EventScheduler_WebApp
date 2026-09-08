@@ -19,7 +19,7 @@ public interface NotificationService {
     int getUnreadNotificationCount(int userId);
 
     // Mark one notification as read
-    boolean markAsRead(int notificationId);
+    boolean markAsRead(int notificationId, int userId);
 
     // Mark all notifications as read for a user
     boolean markAllAsRead(int userId);

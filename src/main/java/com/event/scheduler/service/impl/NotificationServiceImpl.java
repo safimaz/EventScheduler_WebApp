@@ -72,13 +72,16 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public boolean markAsRead(int notificationId) {
+    public boolean markAsRead(int notificationId, int userId) {
 
-        if (notificationId <= 0) {
+        if (notificationId <= 0 || userId <= 0) {
             return false;
         }
 
-        return notificationDAO.markAsRead(notificationId);
+        return notificationDAO.markAsRead(
+            notificationId,
+            userId
+        );
     }
 
     @Override
