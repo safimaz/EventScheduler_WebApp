@@ -576,7 +576,7 @@
                     laptops and other resources.
                 </p>
 
-                <a href="#">
+                <a href="<%= request.getContextPath() %>/admin/resources">
 
                     Manage Resource
 
