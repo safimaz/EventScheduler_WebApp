@@ -112,11 +112,6 @@ public class AdminResourceServlet extends HttpServlet {
 
                 } else {
 
-                    /*
-                     * Keep the same resource ID.
-                     * Update the resource details.
-                     */
-
                     resource.setResourceName(
                             resourceName);
 
@@ -146,6 +141,66 @@ public class AdminResourceServlet extends HttpServlet {
                         request.getSession().setAttribute(
                                 "resourceErrorMessage",
                                 "Unable to update resource.");
+                    }
+                }
+
+            }
+
+
+            /*
+             * ==========================
+             * DEACTIVATE RESOURCE
+             * ==========================
+             */
+
+            else if ("deactivate".equalsIgnoreCase(action)) {
+
+                int resourceId =
+                        Integer.parseInt(
+                                request.getParameter("resourceId"));
+
+
+                // Get the existing resource
+
+                Resource resource =
+                        resourceService.getResourceById(
+                                resourceId);
+
+
+                if (resource == null) {
+
+                    request.getSession().setAttribute(
+                            "resourceErrorMessage",
+                            "Resource not found.");
+
+                } else {
+
+                    /*
+                     * Keep the existing resource ID
+                     * and all other details.
+                     *
+                     * Only change the status.
+                     */
+
+                    resource.setStatus("INACTIVE");
+
+
+                    boolean deactivated =
+                            resourceService.updateResource(
+                                    resource);
+
+
+                    if (deactivated) {
+
+                        request.getSession().setAttribute(
+                                "resourceSuccessMessage",
+                                "Resource deactivated successfully.");
+
+                    } else {
+
+                        request.getSession().setAttribute(
+                                "resourceErrorMessage",
+                                "Unable to deactivate resource.");
                     }
                 }
 
@@ -231,7 +286,6 @@ public class AdminResourceServlet extends HttpServlet {
                 request.getContextPath()
                 + "/admin/resources");
     }
-
     private boolean isAdmin(
             HttpServletRequest request,
             HttpServletResponse response)

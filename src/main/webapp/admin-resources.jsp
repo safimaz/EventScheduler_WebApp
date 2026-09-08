@@ -1,30 +1,43 @@
-<%@ page language="java"
-    contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-
 <%@ page import="java.util.List" %>
 <%@ page import="com.event.scheduler.model.Resource" %>
 <%@ page import="com.event.scheduler.model.User" %>
 
 <%
+    // =========================
+    // ADMIN SESSION CHECK
+    // =========================
+
     User loggedInUser =
             (User) session.getAttribute("loggedInUser");
 
-    if (loggedInUser == null) {
+    if (loggedInUser == null ||
+            !"ADMIN".equalsIgnoreCase(loggedInUser.getRole())) {
 
-        response.sendRedirect("login.jsp");
+        response.sendRedirect(
+                request.getContextPath() + "/login.jsp");
+
         return;
     }
 
-    if (!"ADMIN".equalsIgnoreCase(
-            loggedInUser.getRole())) {
-
-        response.sendRedirect("dashboard.jsp");
-        return;
-    }
+    // =========================
+    // RESOURCE DATA
+    // =========================
 
     List<Resource> resources =
             (List<Resource>) request.getAttribute("resources");
+
+    // =========================
+    // FLASH MESSAGES
+    // =========================
+
+    String successMessage =
+            (String) session.getAttribute("resourceSuccessMessage");
+
+    String errorMessage =
+            (String) session.getAttribute("resourceErrorMessage");
+
+    session.removeAttribute("resourceSuccessMessage");
+    session.removeAttribute("resourceErrorMessage");
 %>
 
 <!DOCTYPE html>
@@ -34,7 +47,7 @@
 
     <meta charset="UTF-8">
 
-    <title>Resource Management | EventSync</title>
+    <title>Resource Management - EventSync</title>
 
     <style>
 
@@ -45,19 +58,18 @@
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background: #f4f6f9;
-            color: #333;
+            background: #f4f6f8;
+            color: #1f2937;
         }
 
-
-        /* Header */
+        /* =========================
+           HEADER
+           ========================= */
 
         .header {
-            background: #1f2937;
+            background: #1e293b;
             color: white;
-
             padding: 20px 40px;
-
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -70,196 +82,174 @@
 
         .back-btn {
             text-decoration: none;
-
             color: white;
-
-            background: #374151;
-
+            background: #475569;
             padding: 10px 18px;
-
             border-radius: 6px;
+            font-weight: bold;
         }
 
+        .back-btn:hover {
+            background: #334155;
+        }
 
-        /* Container */
+        /* =========================
+           MAIN CONTAINER
+           ========================= */
 
         .container {
             max-width: 1200px;
-
-            margin: 35px auto;
-
+            margin: 40px auto;
             padding: 0 20px;
         }
 
-
-        /* Page Header */
-
         .page-header {
             display: flex;
-
             justify-content: space-between;
-
             align-items: center;
-
             margin-bottom: 25px;
         }
 
         .page-header h2 {
             margin: 0;
-
             font-size: 28px;
         }
 
+        /* =========================
+           ADD RESOURCE BUTTON
+           ========================= */
+
         .add-btn {
             text-decoration: none;
-
-            background: #2563eb;
-
+            background: #16a34a;
             color: white;
-
-            padding: 12px 20px;
-
+            padding: 11px 18px;
             border-radius: 6px;
-
             font-weight: bold;
         }
 
         .add-btn:hover {
-            background: #1d4ed8;
+            background: #15803d;
         }
 
-
-        /* Messages */
+        /* =========================
+           FLASH MESSAGES
+           ========================= */
 
         .success-message {
             background: #dcfce7;
-
             color: #166534;
-
+            border: 1px solid #86efac;
             padding: 12px 16px;
-
             border-radius: 6px;
-
             margin-bottom: 20px;
         }
 
         .error-message {
             background: #fee2e2;
-
             color: #991b1b;
-
+            border: 1px solid #fca5a5;
             padding: 12px 16px;
-
             border-radius: 6px;
-
             margin-bottom: 20px;
         }
 
+        /* =========================
+           RESOURCE GRID
+           ========================= */
 
-        /* Resource Grid */
-
-        .resources-grid {
+        .resource-grid {
             display: grid;
-
             grid-template-columns:
                 repeat(auto-fit, minmax(300px, 1fr));
 
             gap: 20px;
         }
 
-
-        /* Resource Card */
+        /* =========================
+           RESOURCE CARD
+           ========================= */
 
         .resource-card {
             background: white;
-
             border-radius: 10px;
-
             padding: 22px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease;
+        }
 
-            box-shadow:
-                0 2px 8px rgba(0, 0, 0, 0.08);
-
-            display: flex;
-
-            flex-direction: column;
+        .resource-card:hover {
+            transform: translateY(-3px);
         }
 
         .resource-card h3 {
             margin-top: 0;
-
-            margin-bottom: 12px;
-
+            margin-bottom: 15px;
             font-size: 21px;
         }
 
-        .resource-info {
-            margin: 8px 0;
-
-            color: #555;
+        .resource-details {
+            margin-bottom: 15px;
         }
 
+        .resource-details p {
+            margin: 8px 0;
+            font-size: 15px;
+        }
 
-        /* Status */
-
-        .status {
-            display: inline-block;
-
-            align-self: flex-start;
-
-            margin-top: 12px;
-
-            padding: 6px 12px;
-
-            border-radius: 20px;
-
-            font-size: 13px;
-
+        .label {
             font-weight: bold;
         }
 
-        .available {
-            background: #dcfce7;
+        /* =========================
+           STATUS
+           ========================= */
 
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .status-available {
+            background: #dcfce7;
             color: #166534;
         }
 
-        .maintenance {
+        .status-maintenance {
             background: #fef3c7;
-
             color: #92400e;
         }
 
-        .inactive {
+        .status-inactive {
             background: #fee2e2;
-
             color: #991b1b;
         }
 
-
-        /* Resource Actions */
+        /* =========================
+           RESOURCE ACTIONS
+           ========================= */
 
         .resource-actions {
-            margin-top: 20px;
-
             display: flex;
-
             gap: 10px;
-
-            flex-wrap: wrap;
+            margin-top: 18px;
+            align-items: center;
         }
 
+        /* =========================
+           EDIT BUTTON
+           ========================= */
+
         .edit-btn {
+            display: inline-block;
             text-decoration: none;
-
             background: #2563eb;
-
             color: white;
-
             padding: 9px 16px;
-
             border-radius: 6px;
-
             font-weight: bold;
         }
 
@@ -267,81 +257,71 @@
             background: #1d4ed8;
         }
 
+        /* =========================
+           DEACTIVATE BUTTON
+           ========================= */
 
-        /* Empty */
-
-        .empty {
-            background: white;
-
-            padding: 40px;
-
-            text-align: center;
-
-            border-radius: 10px;
-
-            color: #666;
+        .deactivate-btn {
+            border: none;
+            background: #dc2626;
+            color: white;
+            padding: 9px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
         }
 
+        .deactivate-btn:hover {
+            background: #b91c1c;
+        }
 
-        /* Mobile */
+        /* =========================
+           NO RESOURCES
+           ========================= */
 
-        @media (max-width: 600px) {
-
-            .header {
-                padding: 18px 20px;
-            }
-
-            .page-header {
-                flex-direction: column;
-
-                align-items: flex-start;
-
-                gap: 15px;
-            }
-
+        .no-resources {
+            background: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px;
+            color: #64748b;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
         }
 
     </style>
 
 </head>
 
-
 <body>
 
-
-    <!-- Header -->
+    <!-- =========================
+         HEADER
+         ========================= -->
 
     <div class="header">
 
-        <h1>
-            EventSync Admin
-        </h1>
-
+        <h1>EventSync - Resource Management</h1>
 
         <a
-            href="<%= request.getContextPath() %>/dashboard.jsp"
+            href="<%= request.getContextPath() %>/admin/dashboard"
             class="back-btn">
 
-            Dashboard
+            Back to Admin Dashboard
 
         </a>
 
     </div>
 
 
-    <!-- Main Container -->
+    <!-- =========================
+         MAIN CONTENT
+         ========================= -->
 
     <div class="container">
 
-
-        <!-- Page Header -->
-
         <div class="page-header">
 
-            <h2>
-                Resource Management
-            </h2>
-
+            <h2>Manage Resources</h2>
 
             <a
                 href="<%= request.getContextPath() %>/add-resource.jsp"
@@ -354,172 +334,126 @@
         </div>
 
 
-        <!-- Flash Messages -->
+        <!-- =========================
+             SUCCESS MESSAGE
+             ========================= -->
 
-        <%
-
-            String resourceSuccessMessage =
-                    (String) session.getAttribute(
-                            "resourceSuccessMessage");
-
-
-            String resourceErrorMessage =
-                    (String) session.getAttribute(
-                            "resourceErrorMessage");
-
-
-            session.removeAttribute(
-                    "resourceSuccessMessage");
-
-
-            session.removeAttribute(
-                    "resourceErrorMessage");
-
-        %>
-
-
-        <% if (resourceSuccessMessage != null) { %>
+        <% if (successMessage != null) { %>
 
             <div class="success-message">
 
-                <%= resourceSuccessMessage %>
+                <%= successMessage %>
 
             </div>
 
         <% } %>
 
 
-        <% if (resourceErrorMessage != null) { %>
+        <!-- =========================
+             ERROR MESSAGE
+             ========================= -->
+
+        <% if (errorMessage != null) { %>
 
             <div class="error-message">
 
-                <%= resourceErrorMessage %>
+                <%= errorMessage %>
 
             </div>
 
         <% } %>
 
 
-        <!-- Resource List -->
+        <!-- =========================
+             RESOURCE LIST
+             ========================= -->
 
-        <%
+        <% if (resources != null && !resources.isEmpty()) { %>
 
-            if (resources == null ||
-                resources.isEmpty()) {
+            <div class="resource-grid">
 
-        %>
-
-
-            <div class="empty">
-
-                <h3>
-                    No resources found
-                </h3>
-
-                <p>
-                    There are currently no resources
-                    available in the system.
-                </p>
-
-            </div>
-
-
-        <%
-
-            } else {
-
-        %>
-
-
-            <div class="resources-grid">
-
-
-                <%
-
-                    for (Resource resource :
-                            resources) {
-
-
-                        String status =
-                                resource.getStatus();
-
-
-                        String statusClass =
-                                "available";
-
-
-                        if ("MAINTENANCE"
-                                .equalsIgnoreCase(status)) {
-
-                            statusClass =
-                                    "maintenance";
-
-                        } else if ("INACTIVE"
-                                .equalsIgnoreCase(status)) {
-
-                            statusClass =
-                                    "inactive";
-                        }
-
-                %>
-
-
-                    <!-- Resource Card -->
+                <% for (Resource resource : resources) { %>
 
                     <div class="resource-card">
-
 
                         <!-- Resource Name -->
 
                         <h3>
-
                             <%= resource.getResourceName() %>
-
                         </h3>
 
 
-                        <!-- Resource Type -->
+                        <!-- Resource Details -->
 
-                        <div class="resource-info">
+                        <div class="resource-details">
 
-                            <strong>
-                                Type:
-                            </strong>
+                            <p>
+                                <span class="label">
+                                    Resource ID:
+                                </span>
 
-                            <%= resource.getResourceType() %>
+                                <%= resource.getResourceId() %>
+                            </p>
+
+
+                            <p>
+                                <span class="label">
+                                    Type:
+                                </span>
+
+                                <%= resource.getResourceType() %>
+                            </p>
+
+
+                            <p>
+                                <span class="label">
+                                    Quantity:
+                                </span>
+
+                                <%= resource.getQuantity() %>
+                            </p>
+
+
+                            <p>
+
+                                <span class="label">
+                                    Status:
+                                </span>
+
+                                <% if ("AVAILABLE".equalsIgnoreCase(
+                                        resource.getStatus())) { %>
+
+                                    <span class="status status-available">
+                                        AVAILABLE
+                                    </span>
+
+                                <% } else if ("MAINTENANCE".equalsIgnoreCase(
+                                        resource.getStatus())) { %>
+
+                                    <span class="status status-maintenance">
+                                        MAINTENANCE
+                                    </span>
+
+                                <% } else { %>
+
+                                    <span class="status status-inactive">
+                                        INACTIVE
+                                    </span>
+
+                                <% } %>
+
+                            </p>
 
                         </div>
 
 
-                        <!-- Quantity -->
-
-                        <div class="resource-info">
-
-                            <strong>
-                                Quantity:
-                            </strong>
-
-                            <%= resource.getQuantity() %>
-
-                        </div>
-
-
-                        <!-- Status -->
-
-                        <div
-                            class="status <%= statusClass %>">
-
-                            <%= status %>
-
-                        </div>
-
-
-                        <!-- Resource Actions -->
+                        <!-- =========================
+                             RESOURCE ACTIONS
+                             ========================= -->
 
                         <div class="resource-actions">
 
-
-                            <!-- Edit Resource -->
+                            <!-- EDIT RESOURCE -->
 
                             <a
                                 href="<%= request.getContextPath() %>/edit-resource.jsp?resourceId=<%= resource.getResourceId() %>"
@@ -530,31 +464,63 @@
                             </a>
 
 
-                        </div>
+                            <!-- DEACTIVATE RESOURCE -->
 
+                            <% if (!"INACTIVE".equalsIgnoreCase(
+                                    resource.getStatus())) { %>
+
+                                <form
+                                    action="<%= request.getContextPath() %>/admin/resources"
+                                    method="post"
+                                    style="margin: 0;"
+                                    onsubmit="return confirm('Are you sure you want to deactivate this resource?');">
+
+                                    <input
+                                        type="hidden"
+                                        name="action"
+                                        value="deactivate">
+
+                                    <input
+                                        type="hidden"
+                                        name="resourceId"
+                                        value="<%= resource.getResourceId() %>">
+
+                                    <button
+                                        type="submit"
+                                        class="deactivate-btn">
+
+                                        Deactivate Resource
+
+                                    </button>
+
+                                </form>
+
+                            <% } %>
+
+                        </div>
 
                     </div>
 
-
-                <%
-
-                    }
-
-                %>
-
+                <% } %>
 
             </div>
 
+        <% } else { %>
 
-        <%
+            <div class="no-resources">
 
-            }
+                <h3>No Resources Found</h3>
 
-        %>
+                <p>
+                    There are currently no resources available
+                    in the system.
+                </p>
 
+            </div>
+
+        <% } %>
 
     </div>
-
 
 </body>
 
