@@ -2,6 +2,10 @@ package com.event.scheduler.servlet;
 
 import java.io.IOException;
 
+import com.event.scheduler.dao.NotificationDAO;
+import com.event.scheduler.dao.impl.NotificationDAOImpl;
+import com.event.scheduler.model.Booking;
+import com.event.scheduler.model.Notification;
 import com.event.scheduler.model.User;
 import com.event.scheduler.service.BookingService;
 import com.event.scheduler.service.impl.BookingServiceImpl;
@@ -19,12 +23,16 @@ public class AdminBookingServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     private BookingService bookingService;
+    private NotificationDAO notificationDAO;
 
     @Override
     public void init() throws ServletException {
 
         bookingService =
                 new BookingServiceImpl();
+
+        notificationDAO =
+                new NotificationDAOImpl();
     }
 
     @Override
@@ -75,7 +83,10 @@ public class AdminBookingServlet extends HttpServlet {
             boolean success = false;
             String message;
 
-            // APPROVE
+            // =========================================
+            // APPROVE BOOKING
+            // =========================================
+
             if ("approve".equalsIgnoreCase(action)) {
 
                 success =
@@ -83,6 +94,27 @@ public class AdminBookingServlet extends HttpServlet {
                                 bookingId);
 
                 if (success) {
+
+                    // Get the booking to find the user
+                    // who created the booking
+                    Booking booking =
+                            bookingService.getBookingById(
+                                    bookingId);
+
+                    // Create notification for the user
+                    if (booking != null) {
+
+                        Notification notification =
+                                new Notification(
+                                        booking.getUserId(),
+                                        "Your booking has been approved.",
+                                        "BOOKING_APPROVED",
+                                        "N"
+                                );
+
+                        notificationDAO.addNotification(
+                                notification);
+                    }
 
                     message =
                             "Booking #"
@@ -100,7 +132,10 @@ public class AdminBookingServlet extends HttpServlet {
                             + "room/resource conflict.";
                 }
 
-            // REJECT
+            // =========================================
+            // REJECT BOOKING
+            // =========================================
+
             } else if ("reject".equalsIgnoreCase(action)) {
 
                 success =
@@ -109,6 +144,27 @@ public class AdminBookingServlet extends HttpServlet {
                                 "REJECTED");
 
                 if (success) {
+
+                    // Get the booking to find the user
+                    // who created the booking
+                    Booking booking =
+                            bookingService.getBookingById(
+                                    bookingId);
+
+                    // Create notification for the user
+                    if (booking != null) {
+
+                        Notification notification =
+                                new Notification(
+                                        booking.getUserId(),
+                                        "Your booking has been rejected.",
+                                        "BOOKING_REJECTED",
+                                        "N"
+                                );
+
+                        notificationDAO.addNotification(
+                                notification);
+                    }
 
                     message =
                             "Booking #"
@@ -127,7 +183,6 @@ public class AdminBookingServlet extends HttpServlet {
 
                 message =
                         "Invalid booking action.";
-
             }
 
             session.setAttribute(
