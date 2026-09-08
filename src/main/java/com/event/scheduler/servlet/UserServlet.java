@@ -44,6 +44,19 @@ public class UserServlet extends HttpServlet {
             return;
         }
 
+        // Get success message
+        String successMessage =
+                (String) session.getAttribute("successMessage");
+
+        if (successMessage != null) {
+
+            request.setAttribute(
+                    "successMessage",
+                    successMessage);
+
+            session.removeAttribute("successMessage");
+        }
+
         // Get all users
         List<User> users =
                 userService.getAllUsers();
@@ -79,7 +92,7 @@ public class UserServlet extends HttpServlet {
         try {
 
             // ------------------------------------
-            // Read user information from form
+            // Read user information
             // ------------------------------------
 
             String name =
@@ -123,11 +136,22 @@ public class UserServlet extends HttpServlet {
 
             if (created) {
 
-                session.setAttribute(
+                request.setAttribute(
                         "successMessage",
                         "User created successfully.");
 
-                response.sendRedirect("users");
+                // Get updated user list
+                List<User> users =
+                        userService.getAllUsers();
+
+                request.setAttribute(
+                        "users",
+                        users);
+
+                // Show users page
+                request.getRequestDispatcher(
+                        "users.jsp")
+                        .forward(request, response);
 
                 return;
             }
@@ -138,7 +162,12 @@ public class UserServlet extends HttpServlet {
 
             request.setAttribute(
                     "errorMessage",
-                    "Unable to create user.");
+                    "Unable to create user. "
+                    + "The email may already exist.");
+
+            request.getRequestDispatcher(
+                    "create-user.jsp")
+                    .forward(request, response);
 
         } catch (Exception e) {
 
@@ -146,12 +175,13 @@ public class UserServlet extends HttpServlet {
 
             request.setAttribute(
                     "errorMessage",
-                    "Invalid user information.");
-        }
+                    "Unable to create user. "
+                    + "The email may already exist or "
+                    + "some information is invalid.");
 
-        // Return to create user form
-        request.getRequestDispatcher(
-                "create-user.jsp")
-                .forward(request, response);
+            request.getRequestDispatcher(
+                    "create-user.jsp")
+                    .forward(request, response);
+        }
     }
 }
