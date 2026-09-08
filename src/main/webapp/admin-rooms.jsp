@@ -49,10 +49,13 @@
             color: #333;
         }
 
+        /* Header */
+
         .header {
             background: #1f2937;
             color: white;
             padding: 20px 40px;
+
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -71,11 +74,15 @@
             border-radius: 6px;
         }
 
+        /* Main Container */
+
         .container {
             max-width: 1200px;
             margin: 35px auto;
             padding: 0 20px;
         }
+
+        /* Page Header */
 
         .page-header {
             display: flex;
@@ -98,19 +105,49 @@
             font-weight: bold;
         }
 
+        /* Messages */
+
+        .success-message {
+            background: #dcfce7;
+            color: #166534;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        /* Room Grid */
+
         .rooms-grid {
             display: grid;
+
             grid-template-columns:
                 repeat(auto-fit, minmax(300px, 1fr));
+
             gap: 20px;
         }
 
+        /* Room Card */
+
         .room-card {
             background: white;
+
             border-radius: 10px;
+
             padding: 22px;
+
             box-shadow:
                 0 2px 8px rgba(0, 0, 0, 0.08);
+
+            display: flex;
+            flex-direction: column;
         }
 
         .room-card h3 {
@@ -124,12 +161,21 @@
             color: #555;
         }
 
+        /* Status */
+
         .status {
             display: inline-block;
+
+            align-self: flex-start;
+
             margin-top: 12px;
+
             padding: 6px 12px;
+
             border-radius: 20px;
+
             font-size: 13px;
+
             font-weight: bold;
         }
 
@@ -148,19 +194,79 @@
             color: #991b1b;
         }
 
+        /* Description */
+
         .description {
             margin-top: 15px;
             color: #666;
             line-height: 1.5;
         }
 
+        /* Room Actions */
+
+        .room-actions {
+            margin-top: 20px;
+
+            display: flex;
+
+            gap: 10px;
+
+            flex-wrap: wrap;
+        }
+
+        .edit-btn {
+            text-decoration: none;
+
+            background: #2563eb;
+
+            color: white;
+
+            padding: 9px 16px;
+
+            border-radius: 6px;
+
+            font-weight: bold;
+        }
+
+        .edit-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .deactivate-btn {
+            border: none;
+
+            background: #dc2626;
+
+            color: white;
+
+            padding: 9px 16px;
+
+            border-radius: 6px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        .deactivate-btn:hover {
+            background: #b91c1c;
+        }
+
+        /* Empty State */
+
         .empty {
             background: white;
+
             padding: 40px;
+
             text-align: center;
+
             border-radius: 10px;
+
             color: #666;
         }
+
+        /* Mobile */
 
         @media (max-width: 600px) {
 
@@ -170,7 +276,9 @@
 
             .page-header {
                 flex-direction: column;
+
                 align-items: flex-start;
+
                 gap: 15px;
             }
 
@@ -180,7 +288,11 @@
 
 </head>
 
+
 <body>
+
+
+    <!-- Header -->
 
     <div class="header">
 
@@ -189,87 +301,95 @@
         <a
             href="<%= request.getContextPath() %>/dashboard.jsp"
             class="back-btn">
+
             Dashboard
+
         </a>
 
     </div>
 
 
+    <!-- Main Container -->
+
     <div class="container">
+
+
+        <!-- Page Header -->
 
         <div class="page-header">
 
-            <h2>Room Management</h2>
+            <h2>
+                Room Management
+            </h2>
 
-            <!-- We will implement this in the next step -->
-            <a href="<%= request.getContextPath() %>/add-room.jsp"
-               class="add-btn">
+            <a
+                href="<%= request.getContextPath() %>/add-room.jsp"
+                class="add-btn">
+
                 + Add Room
+
             </a>
 
         </div>
-       <%
-    String roomSuccessMessage =
-            (String) session.getAttribute(
-                    "roomSuccessMessage");
-
-    String roomErrorMessage =
-            (String) session.getAttribute(
-                    "roomErrorMessage");
-
-    session.removeAttribute(
-            "roomSuccessMessage");
-
-    session.removeAttribute(
-            "roomErrorMessage");
-%>
-
-<%
-    if (roomSuccessMessage != null) {
-%>
-
-    <div style="
-        background: #dcfce7;
-        color: #166534;
-        padding: 12px 16px;
-        border-radius: 6px;
-        margin-bottom: 20px;">
-        
-        <%= roomSuccessMessage %>
-
-    </div>
-
-<%
-    }
-%>
 
 
-<%
-    if (roomErrorMessage != null) {
-%>
-
-    <div style="
-        background: #fee2e2;
-        color: #991b1b;
-        padding: 12px 16px;
-        border-radius: 6px;
-        margin-bottom: 20px;">
-
-        <%= roomErrorMessage %>
-
-    </div>
-
-<%
-    }
-%>
+        <!-- Flash Messages -->
 
         <%
-            if (rooms == null || rooms.isEmpty()) {
+
+            String roomSuccessMessage =
+                    (String) session.getAttribute(
+                            "roomSuccessMessage");
+
+            String roomErrorMessage =
+                    (String) session.getAttribute(
+                            "roomErrorMessage");
+
+            session.removeAttribute(
+                    "roomSuccessMessage");
+
+            session.removeAttribute(
+                    "roomErrorMessage");
+
         %>
+
+
+        <% if (roomSuccessMessage != null) { %>
+
+            <div class="success-message">
+
+                <%= roomSuccessMessage %>
+
+            </div>
+
+        <% } %>
+
+
+        <% if (roomErrorMessage != null) { %>
+
+            <div class="error-message">
+
+                <%= roomErrorMessage %>
+
+            </div>
+
+        <% } %>
+
+
+        <!-- Room List -->
+
+        <%
+
+            if (rooms == null || rooms.isEmpty()) {
+
+        %>
+
 
             <div class="empty">
 
-                <h3>No rooms found</h3>
+                <h3>
+                    No rooms found
+                </h3>
 
                 <p>
                     There are currently no rooms
@@ -278,13 +398,19 @@
 
             </div>
 
+
         <%
+
             } else {
+
         %>
+
 
             <div class="rooms-grid">
 
+
                 <%
+
                     for (Room room : rooms) {
 
                         String status =
@@ -292,6 +418,7 @@
 
                         String statusClass =
                                 "available";
+
 
                         if ("MAINTENANCE"
                                 .equalsIgnoreCase(status)) {
@@ -305,53 +432,52 @@
                             statusClass =
                                     "inactive";
                         }
+
                 %>
+
+
+                    <!-- Room Card -->
 
                     <div class="room-card">
 
+
+                        <!-- Room Name -->
+
                         <h3>
+
                             <%= room.getRoomName() %>
+
                         </h3>
+
+
+                        <!-- Capacity -->
 
                         <div class="room-info">
 
-                            <strong>Capacity:</strong>
+                            <strong>
+                                Capacity:
+                            </strong>
 
                             <%= room.getCapacity() %>
                             people
 
                         </div>
-                        <div style="
-    margin-top: 20px;
-    display: flex;
-    gap: 10px;">
 
-    <a
-        href="<%= request.getContextPath() %>/edit-room.jsp?roomId=<%= room.getRoomId() %>"
-        style="
-            text-decoration: none;
-            background: #2563eb;
-            color: white;
-            padding: 9px 16px;
-            border-radius: 6px;
-            font-weight: bold;">
 
-        Edit Room
-
-    </a>
-
-</div>
-                        
-
+                        <!-- Location -->
 
                         <div class="room-info">
 
-                            <strong>Location:</strong>
+                            <strong>
+                                Location:
+                            </strong>
 
                             <%= room.getLocation() %>
 
                         </div>
 
+
+                        <!-- Status -->
 
                         <div
                             class="status <%= statusClass %>">
@@ -361,12 +487,18 @@
                         </div>
 
 
+                        <!-- Description -->
+
                         <%
+
                             if (room.getDescription()
                                     != null &&
+
                                 !room.getDescription()
                                     .trim().isEmpty()) {
+
                         %>
+
 
                             <div class="description">
 
@@ -380,23 +512,105 @@
 
                             </div>
 
+
                         <%
+
                             }
+
                         %>
+
+
+                        <!-- Room Actions -->
+
+                        <div class="room-actions">
+
+
+                            <!-- Edit Room -->
+
+                            <a
+                                href="<%= request.getContextPath() %>/edit-room.jsp?roomId=<%= room.getRoomId() %>"
+                                class="edit-btn">
+
+                                Edit Room
+
+                            </a>
+
+
+                            <!-- Deactivate Room -->
+
+                            <%
+
+                                if (!"INACTIVE"
+                                        .equalsIgnoreCase(
+                                                room.getStatus())) {
+
+                            %>
+
+
+                                <form
+                                    action="<%= request.getContextPath() %>/admin/rooms"
+                                    method="post"
+                                    style="margin: 0;"
+
+                                    onsubmit="return confirm('Are you sure you want to deactivate this room?');">
+
+
+                                    <input
+                                        type="hidden"
+                                        name="action"
+                                        value="deactivate">
+
+
+                                    <input
+                                        type="hidden"
+                                        name="roomId"
+                                        value="<%= room.getRoomId() %>">
+
+
+                                    <button
+                                        type="submit"
+                                        class="deactivate-btn">
+
+                                        Deactivate Room
+
+                                    </button>
+
+
+                                </form>
+
+
+                            <%
+
+                                }
+
+                            %>
+
+
+                        </div>
+
 
                     </div>
 
+
                 <%
+
                     }
+
                 %>
+
 
             </div>
 
+
         <%
+
             }
+
         %>
 
+
     </div>
+
 
 </body>
 
