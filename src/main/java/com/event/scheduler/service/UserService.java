@@ -10,9 +10,13 @@ public interface UserService {
 
     User getUserById(int userId);
 
+    User getUserByEmail(String email);
+
     List<User> getAllUsers();
 
     boolean updateUser(User user);
 
     boolean deleteUser(int userId);
+
+    boolean validateLogin(String email, String password);
 }

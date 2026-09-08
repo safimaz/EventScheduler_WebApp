@@ -58,26 +58,21 @@ public class BookingServiceImpl
                 roomDAO.getRoomById(
                         booking.getRoomId());
 
-        if (room == null) {
-            return false;
-        }
+        
 
         // -----------------------------------------
         // 3. Check room status
         // -----------------------------------------
 
-        if (!"AVAILABLE".equalsIgnoreCase(
-                room.getStatus())) {
-
-            return false;
-        }
+        
 
         // -----------------------------------------
         // 4. Check room capacity
         // -----------------------------------------
 
-        if (booking.getAttendeeCount()
-                > room.getCapacity()) {
+        if ((room == null) || !"AVAILABLE".equalsIgnoreCase(
+                room.getStatus()) || (booking.getAttendeeCount()
+                > room.getCapacity())) {
 
             return false;
         }
@@ -189,35 +184,27 @@ public class BookingServiceImpl
                 roomDAO.getRoomById(
                         booking.getRoomId());
 
-        if (room == null) {
-            return false;
-        }
+        
 
         // -----------------------------------------
         // 3. Check room status
         // -----------------------------------------
 
-        if (!"AVAILABLE".equalsIgnoreCase(
-                room.getStatus())) {
-
-            return false;
-        }
+        
 
         // -----------------------------------------
         // 4. Check room capacity
         // -----------------------------------------
 
-        if (booking.getAttendeeCount()
-                > room.getCapacity()) {
-
-            return false;
-        }
+        
 
         // -----------------------------------------
         // 5. Check room availability
         // -----------------------------------------
 
-        if (!bookingDAO.isRoomAvailable(
+        if ((room == null) || !"AVAILABLE".equalsIgnoreCase(
+                room.getStatus()) || (booking.getAttendeeCount()
+                > room.getCapacity()) || !bookingDAO.isRoomAvailable(
                 booking.getRoomId(),
                 booking.getStartTime(),
                 booking.getEndTime())) {
