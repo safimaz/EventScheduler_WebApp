@@ -714,7 +714,7 @@
                             id="email"
                             name="email"
                             placeholder="Enter your email"
-                            required
+                            
                         >
 
                     </div>
@@ -742,7 +742,7 @@
                             id="password"
                             name="password"
                             placeholder="Enter your password"
-                            required
+                            
                         >
 
                     </div>

@@ -50,7 +50,7 @@ public class LoginServlet extends HttpServlet {
                     "Email and password are required."
             );
 
-            request.getRequestDispatcher("login.jsp")
+            request.getRequestDispatcher("error.jsp")
                    .forward(request, response);
 
             return;
