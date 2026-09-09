@@ -18,9 +18,19 @@
 
     if (!"ADMIN".equalsIgnoreCase(
             loggedInUser.getRole())) {
+		
+    	request.setAttribute(
+                "errorMessage",
+                "Access Denied. Admin Login is required."
+            );
 
+            request.getRequestDispatcher("/error.jsp")
+                   .forward(request, response);
+    	
+    	/*
         response.sendRedirect("dashboard.jsp");
-        return;
+        */
+    	return;
     }
 
     List<Room> rooms =

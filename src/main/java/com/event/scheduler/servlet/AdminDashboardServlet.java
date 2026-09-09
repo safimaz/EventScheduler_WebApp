@@ -43,9 +43,17 @@ public class AdminDashboardServlet extends HttpServlet {
         if (!"ADMIN".equalsIgnoreCase(
                 loggedInUser.getRole())) {
 
-            response.sendError(
-                    HttpServletResponse.SC_FORBIDDEN,
-                    "Access Denied. Admin privileges required.");
+//            response.sendError(
+//                    HttpServletResponse.SC_FORBIDDEN,
+//                    "Access Denied. Admin privileges required.");
+            
+            request.setAttribute(
+                    "errorMessage",
+                    "Access Denied. Admin privileges required."
+                );
+
+                request.getRequestDispatcher("/error.jsp")
+                       .forward(request, response);
 
             return;
         }

@@ -9,14 +9,32 @@
             (User) session.getAttribute("loggedInUser");
 
     if (loggedInUser == null) {
-        response.sendRedirect("login.jsp");
+        /*response.sendRedirect("login.jsp");*/
+        
+        request.setAttribute(
+                "errorMessage",
+                "Access Denied. Login is required."
+            );
+
+            request.getRequestDispatcher("/error.jsp")
+                   .forward(request, response);
+        
+        
         return;
     }
 
     if (!"ADMIN".equalsIgnoreCase(
             loggedInUser.getRole())) {
+    	
+    	request.setAttribute(
+                "errorMessage",
+                "Access Denied. Admin Login is required."
+            );
 
-        response.sendRedirect("dashboard.jsp");
+            request.getRequestDispatcher("/error.jsp")
+                   .forward(request, response);
+
+        /* response.sendRedirect("dashboard.jsp");*/
         return;
     }
 %>

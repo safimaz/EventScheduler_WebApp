@@ -40,7 +40,15 @@ public class UserServlet extends HttpServlet {
         if (session == null ||
                 session.getAttribute("loggedInUser") == null) {
 
-            response.sendRedirect("login.jsp");
+//            response.sendRedirect("login.jsp");
+        	
+        	request.setAttribute(
+                    "errorMessage",
+                    "Access Denied. Login is required."
+                );
+
+                request.getRequestDispatcher("/error.jsp")
+                       .forward(request, response);
             return;
         }
 
@@ -85,7 +93,15 @@ public class UserServlet extends HttpServlet {
         if (session == null ||
                 session.getAttribute("loggedInUser") == null) {
 
-            response.sendRedirect("login.jsp");
+//            response.sendRedirect("login.jsp");
+        	
+        	request.setAttribute(
+                    "errorMessage",
+                    "Login is required."
+                );
+
+                request.getRequestDispatcher("/error.jsp")
+                       .forward(request, response);
             return;
         }
 

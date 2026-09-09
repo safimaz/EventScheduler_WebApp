@@ -16,9 +16,19 @@
 
     if (loggedInUser == null) {
 
+    	/*
         response.sendRedirect(
             request.getContextPath() + "/login.jsp"
         );
+    	*/
+        
+        request.setAttribute(
+                "errorMessage",
+                "Access Denied. Login is required."
+            );
+
+            request.getRequestDispatcher("/error.jsp")
+                   .forward(request, response);
 
         return;
     }

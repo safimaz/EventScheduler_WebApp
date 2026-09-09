@@ -9,16 +9,36 @@
             (User) session.getAttribute("loggedInUser");
 
     if (loggedInUser == null) {
-
+		/*
         response.sendRedirect("login.jsp");
-        return;
+        */
+		
+        request.setAttribute(
+                "errorMessage",
+                "Access Denied. Login is required."
+            );
+
+            request.getRequestDispatcher("/error.jsp")
+                   .forward(request, response);
+		
+		return;
     }
 
     if (!"ADMIN".equalsIgnoreCase(
             loggedInUser.getRole())) {
-
+		/*
         response.sendRedirect("dashboard.jsp");
-        return;
+        */
+		
+        request.setAttribute(
+                "errorMessage",
+                "Access Denied. Admin privilage is required."
+            );
+
+            request.getRequestDispatcher("/error.jsp")
+                   .forward(request, response);
+        
+		return;
     }
 %>
 

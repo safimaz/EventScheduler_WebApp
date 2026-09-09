@@ -47,6 +47,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean validateLogin(String email, String password) {
+    	
+    	// Validate email
+        if (email == null || email.trim().isEmpty()) {
+            return false;
+        }
+
+        // Validate password
+        if (password == null || password.trim().isEmpty()) {
+            return false;
+        }
+
+    	
         return userDAO.validateLogin(email, password);
     }
 }

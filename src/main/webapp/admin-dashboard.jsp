@@ -11,8 +11,14 @@
             (User) session.getAttribute("loggedInUser");
 
     if (loggedInUser == null) {
+		
+    	request.setAttribute(
+                "errorMessage",
+                "Access Denied. Admin privilage is required."
+            );
 
-        response.sendRedirect("login.jsp");
+            request.getRequestDispatcher("/error.jsp")
+                   .forward(request, response);
 
         return;
 
@@ -21,9 +27,13 @@
     if (!"ADMIN".equalsIgnoreCase(
             loggedInUser.getRole())) {
 
-        response.sendError(
-                HttpServletResponse.SC_FORBIDDEN,
-                "Access Denied");
+    	request.setAttribute(
+                "errorMessage",
+                "Access Denied. Admin Login is required."
+            );
+
+            request.getRequestDispatcher("/error.jsp")
+                   .forward(request, response);
 
         return;
 
@@ -594,23 +604,23 @@
                 <div class="card-top">
 
                     <div class="card-icon">
-                        ▥
+                        ▤
                     </div>
 
                     <h3>
-                        Reports
+                        Users
                     </h3>
 
                 </div>
 
                 <p>
-                    View room and resource utilization
-                    information.
+                    Manage projectors, microphones,
+                    laptops and other resources.
                 </p>
 
-                <a href="#">
+                <a href="<%= request.getContextPath() %>/users">
 
-                    View Reports
+                    Manage Users
 
                     <span class="arrow">
                         →

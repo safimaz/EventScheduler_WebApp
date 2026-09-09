@@ -36,7 +36,13 @@ public class RoomServlet extends HttpServlet {
         if (session == null ||
                 session.getAttribute("loggedInUser") == null) {
 
-            response.sendRedirect("login.jsp");
+        	request.setAttribute(
+                    "errorMessage",
+                    "Access Denied. Login is required."
+                );
+
+                request.getRequestDispatcher("/error.jsp")
+                       .forward(request, response);
             return;
         }
 

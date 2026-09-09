@@ -19,19 +19,40 @@
 
     if (loggedInUser == null) {
 
-        response.sendRedirect("login.jsp");
+        /*response.sendRedirect("login.jsp");*/
 
+        request.setAttribute(
+                "errorMessage",
+                "Access Denied. Login is required."
+            );
+
+            request.getRequestDispatcher("/error.jsp")
+                   .forward(request, response);
+        
+        
+        
         return;
 
     }
 
     if (!"ADMIN".equalsIgnoreCase(
             loggedInUser.getRole())) {
+		
+    	request.setAttribute(
+                "errorMessage",
+                "Access Denied. Admin Login is required."
+            );
 
+            request.getRequestDispatcher("/error.jsp")
+                   .forward(request, response);
+    	
+    	/*
         response.sendError(
                 HttpServletResponse.SC_FORBIDDEN,
                 "Access Denied");
-
+		*/
+    	
+    	
         return;
 
     }

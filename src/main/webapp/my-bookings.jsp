@@ -12,7 +12,17 @@
         (User) session.getAttribute("loggedInUser");
  
     if (loggedInUser == null) {
-        response.sendRedirect("login.jsp");
+        /*response.sendRedirect("login.jsp");*/
+        
+        request.setAttribute(
+                "errorMessage",
+                "Access Denied. Login is required."
+            );
+
+            request.getRequestDispatcher("/error.jsp")
+                   .forward(request, response);
+        
+        
         return;
     }
  

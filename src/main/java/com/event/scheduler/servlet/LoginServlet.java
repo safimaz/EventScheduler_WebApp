@@ -89,13 +89,13 @@ public class LoginServlet extends HttpServlet {
 
         } else {
 
-            request.setAttribute(
-                    "errorMessage",
-                    "Invalid email or password."
-            );
+        	request.setAttribute(
+        	        "errorMessage",
+        	        "User is not registerd."
+        	    );
 
-            request.getRequestDispatcher("login.jsp")
-                   .forward(request, response);
+        	    request.getRequestDispatcher("/error.jsp")
+        	           .forward(request, response);
         }
     }
 }
